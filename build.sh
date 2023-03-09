@@ -5,6 +5,10 @@ if ! command -v ninja &>/dev/null; then
 	return 1
 fi
 
+
+
+
+
 echo "Configuring and building Thirdparty/DBoW2 ..."
 
 # cd Thirdparty/DBoW2
