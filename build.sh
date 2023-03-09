@@ -7,8 +7,6 @@ fi
 
 
 
-
-
 echo "Configuring and building Thirdparty/DBoW2 ..."
 
 # cd Thirdparty/DBoW2
@@ -23,7 +21,7 @@ popd
 #make -j
 echo "Configuring and building Thirdparty/g2o ..."
 
-push Thirdparty/g2o
+pushd Thirdparty/g2o
 cmake -S . -B ./build -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build ./build
 popd
@@ -38,7 +36,7 @@ popd
 #cd ../../Sophus
 echo "Configuring and building Thirdparty/Sophus ..."
 
-push Thirdparty/Sophus
+pushd Thirdparty/Sophus
 cmake -S . -B ./build -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build ./build
 cmake --build ./build --target install # why you do this ORB_SLAM3, why you include this one with abspath and not the others. WHY??
@@ -71,4 +69,4 @@ cmake --build ./build
 
 echo "All done :D"
 
-return 0
+exit 0
