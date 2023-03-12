@@ -45,6 +45,7 @@ find_package(Pangolin REQUIRED)
 # use the local install of OpenCV 4.2.0, to avoid conflict with the system OpenCV
 # Which on Jetpack 5.1 is OpenCV 4.5.1
 # see `./scripts/install_opencv_4.2.0.sh`
+
 set(OpenCV_DIR "~/.local/lib/cmake/opencv4")
 find_package(OpenCV 4.2.0 REQUIRED)
 # find_package(realsense2) # We do not use realsense camera

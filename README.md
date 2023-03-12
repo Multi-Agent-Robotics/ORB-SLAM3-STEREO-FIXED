@@ -13,6 +13,7 @@ This repository is a modified version of [ORB_SLAM3](https://github.com/UZ-SLAML
 Clone the repository:
 ```
 git clone https://github.com/zang09/ORB-SLAM3-STEREO-FIXED.git ORB_SLAM3
+
 ```
 
 Install same required dependencies as original version. Then,  

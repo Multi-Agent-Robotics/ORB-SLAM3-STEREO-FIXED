@@ -21,6 +21,7 @@
 #include <pangolin/pangolin.h>
 
 #include <mutex>
+#include <string>
 
 namespace ORB_SLAM3
 {
@@ -164,7 +165,10 @@ void Viewer::Run()
     mbFinished = false;
     mbStopped = false;
 
-    pangolin::CreateWindowAndBind("ORB-SLAM3: Map Viewer",1024,768);
+    const std::string window_title = "ORB-SLAM3: Map Viewer";
+    const unsigned int window_width = 1024:
+    const unsigned int window_height = 768; 
+    pangolin::CreateWindowAndBind(window_title, window_width, window_height);
 
     // 3D Mouse handler requires depth testing to be enabled
     glEnable(GL_DEPTH_TEST);
@@ -191,13 +195,15 @@ void Viewer::Run()
     pangolin::Var<bool> menuShowOptLba("menu.Show LBA opt", false, true);
     // Define Camera Render Object (for view / scene browsing)
     pangolin::OpenGlRenderState s_cam(
-                pangolin::ProjectionMatrix(1024,768,mViewpointF,mViewpointF,512,389,0.1,1000),
+                pangolin::ProjectionMatrix(window_width,window_height ,mViewpointF,mViewpointF,512,389,0.1,1000),
                 pangolin::ModelViewLookAt(mViewpointX,mViewpointY,mViewpointZ, 0,0,0,0.0,-1.0, 0.0)
                 );
 
+    const float aspect_ratio = static_cast<float>(window_width) / static_cast<float>(window_height);
+
     // Add named OpenGL viewport to window and provide 3D Handler
     pangolin::View& d_cam = pangolin::CreateDisplay()
-            .SetBounds(0.0, 1.0, pangolin::Attach::Pix(175), 1.0, -1024.0f/768.0f)
+            .SetBounds(0.0, 1.0, pangolin::Attach::Pix(175), 1.0, -aspect_ratio)
             .SetHandler(new pangolin::Handler3D(s_cam));
 
     pangolin::OpenGlMatrix Twc, Twr;
@@ -219,7 +225,7 @@ void Viewer::Run()
     float trackedImageScale = mpTracker->GetImageScale();
 
     cout << "Starting the Viewer" << endl;
-    while(1)
+    while(true)
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -242,13 +248,13 @@ void Viewer::Run()
         {
             if(bCameraView)
             {
-                s_cam.SetProjectionMatrix(pangolin::ProjectionMatrix(1024,768,mViewpointF,mViewpointF,512,389,0.1,1000));
+                s_cam.SetProjectionMatrix(pangolin::ProjectionMatrix(window_width,window_height,mViewpointF,mViewpointF,512,389,0.1,1000));
                 s_cam.SetModelViewMatrix(pangolin::ModelViewLookAt(mViewpointX,mViewpointY,mViewpointZ, 0,0,0,0.0,-1.0, 0.0));
                 s_cam.Follow(Twc);
             }
             else
             {
-                s_cam.SetProjectionMatrix(pangolin::ProjectionMatrix(1024,768,3000,3000,512,389,0.1,1000));
+                s_cam.SetProjectionMatrix(pangolin::ProjectionMatrix(window_width,window_height,3000,3000,512,389,0.1,1000));
                 s_cam.SetModelViewMatrix(pangolin::ModelViewLookAt(0,0.01,10, 0,0,0,0.0,0.0, 1.0));
                 s_cam.Follow(Ow);
             }
@@ -263,7 +269,7 @@ void Viewer::Run()
         {
             menuCamView = false;
             bCameraView = true;
-            s_cam.SetProjectionMatrix(pangolin::ProjectionMatrix(1024,768,mViewpointF,mViewpointF,512,389,0.1,10000));
+            s_cam.SetProjectionMatrix(pangolin::ProjectionMatrix(window_width,window_height,mViewpointF,mViewpointF,512,389,0.1,10000));
             s_cam.SetModelViewMatrix(pangolin::ModelViewLookAt(mViewpointX,mViewpointY,mViewpointZ, 0,0,0,0.0,-1.0, 0.0));
             s_cam.Follow(Twc);
         }
@@ -272,7 +278,7 @@ void Viewer::Run()
         {
             menuTopView = false;
             bCameraView = false;
-            s_cam.SetProjectionMatrix(pangolin::ProjectionMatrix(1024,768,3000,3000,512,389,0.1,10000));
+            s_cam.SetProjectionMatrix(pangolin::ProjectionMatrix(window_width,window_height,3000,3000,512,389,0.1,10000));
             s_cam.SetModelViewMatrix(pangolin::ModelViewLookAt(0,0.01,50, 0,0,0,0.0,0.0, 1.0));
             s_cam.Follow(Ow);
         }
