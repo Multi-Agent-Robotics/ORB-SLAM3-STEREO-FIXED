@@ -18,7 +18,7 @@
 
 #include "Settings.h"
 
-#include "CameraModels/CameraModels/Pinhole.h"
+#include "CameraModels/Pinhole.h"
 #include "CameraModels/KannalaBrandt8.h"
 
 #include "System.h"
