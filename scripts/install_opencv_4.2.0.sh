@@ -75,6 +75,8 @@ popd
 
 hr -
 
+# Install apt dependencies
+sudo apt install -y libgtk2.0-dev pkg-config 
 
 # Build OpenCV 4.2.0
 pushd "$DOWNLOAD_DIR/opencv-4.2.0"
