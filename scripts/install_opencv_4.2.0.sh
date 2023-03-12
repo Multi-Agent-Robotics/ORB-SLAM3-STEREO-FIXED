@@ -51,7 +51,7 @@ hr -
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 if [ -z "$1" ]; then
-    DOWNLOAD_DIR="$SCRIPT_DIR/../Thirdparty"
+    DOWNLOAD_DIR="$SCRIPT_DIR/../3rdparty"
 else
     DOWNLOAD_DIR="$1"
 fi

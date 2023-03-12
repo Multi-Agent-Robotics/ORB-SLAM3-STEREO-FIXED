@@ -5,7 +5,11 @@ IF(NOT DEFINED CMAKE_BUILD_TYPE)
   SET(CMAKE_BUILD_TYPE Release)
 ENDIF()
 
-MESSAGE("Build type: " ${CMAKE_BUILD_TYPE})
+function(printvar var)
+  message(STATUS "${var} = ${${var}}")
+endfunction()
+
+printvar(CMAKE_BUILD_TYPE)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wall   -O3")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall   -O3")
@@ -31,11 +35,18 @@ endif()
 # LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
 
 # TODO: include the local install of OpenCV 4.2.0
-list(APPEND CMAKE_MODULE_PATH "~/.local/lib/cmake/opencv4")
+# list(APPEND CMAKE_MODULE_PATH "~/.local/lib/cmake/opencv4")
 
-find_package(OpenCV 4.2 REQUIRED)
 find_package(Eigen3 3.1.0 REQUIRED)
+
+# set(Pangolin_DIR "~/.local/lib/cmake/Pangolin")
 find_package(Pangolin REQUIRED)
+
+# use the local install of OpenCV 4.2.0, to avoid conflict with the system OpenCV
+# Which on Jetpack 5.1 is OpenCV 4.5.1
+# see `./scripts/install_opencv_4.2.0.sh`
+set(OpenCV_DIR "~/.local/lib/cmake/opencv4")
+find_package(OpenCV 4.2.0 REQUIRED)
 # find_package(realsense2) # We do not use realsense camera
 
 include_directories(
