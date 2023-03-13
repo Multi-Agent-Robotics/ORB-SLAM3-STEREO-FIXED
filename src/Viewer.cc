@@ -166,7 +166,7 @@ void Viewer::Run()
     mbStopped = false;
 
     const std::string window_title = "ORB-SLAM3: Map Viewer";
-    const unsigned int window_width = 1024:
+    const unsigned int window_width = 1024;
     const unsigned int window_height = 768; 
     pangolin::CreateWindowAndBind(window_title, window_width, window_height);
 
