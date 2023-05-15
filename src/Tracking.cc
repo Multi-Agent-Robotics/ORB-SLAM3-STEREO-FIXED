@@ -3640,11 +3640,15 @@ bool Tracking::Relocalization()
 
     for(int i=0; i<nKFs; i++)
     {
+        // FOUND(15-05-2023 13:57:07, jens, keyframe): i believe these are the keyframes we need to prune known outliers from
         KeyFrame* pKF = vpCandidateKFs[i];
         if(pKF->isBad())
             vbDiscarded[i] = true;
         else
         {
+            // FOUND(15-05-2023 13:58:10, jens, currentframe): it might be that we need to prune from the current frame mCurrentFrame instead
+            // QUESTION(15-05-2023 14:02:36, jens, currentframe): do we want to remove the features from the frame or simply make sure not to use them in the solver?
+            // ANSWER(15-05-2023 14:02:10, jens, currentframe): we dont know outliers before starting the ransac solver, so we cant do anything here at all
             int nmatches = matcher.SearchByBoW(pKF,mCurrentFrame,vvpMapPointMatches[i]);
             if(nmatches<15)
             {
@@ -3653,6 +3657,18 @@ bool Tracking::Relocalization()
             }
             else
             {
+                // FOUND(15-05-2023 14:00:00, jens, solvers): create solvers for ransac
+                // QUESTION(15-05-2023 14:27:44, jens, solvers): how to remember?
+                // Maybe we can pass a list of features to the solver constructor?
+                // COMMENT(15-05-2023 14:30:37, jens, solvers): However, at this part of the code
+                // we dont pass features around, but rather just work with indices.
+                // And I don't know how to filter features, if we don't have a way to compare them.
+                // We can't simply assume that the features at the same index in the two frames are the same.
+                // Maybe we can use the mCurrentFrame.ExtractORB() function to extract the features
+                // However we would need a datastructure like a database of registered outliers
+                // TODO(15-05-2023 14:36:26, jens, outliers):
+                // 1. implement database of known outliers
+                // 2. return the outliers from the ransac solver ()
                 MLPnPsolver* pSolver = new MLPnPsolver(mCurrentFrame,vvpMapPointMatches[i]);
                 pSolver->SetRansacParameters(0.99,10,300,6,0.5,5.991);  //This solver needs at least 6 points
                 vpMLPnPsolvers[i] = pSolver;
@@ -3672,8 +3688,11 @@ bool Tracking::Relocalization()
         {
             if(vbDiscarded[i])
                 continue;
+            
+            // FOUND(15-05-2023 14:00:52, jens, ransac): run ransac - this must be where the outlier memory will need to be implemented
 
             // Perform 5 Ransac Iterations
+            // FOUND(15-05-2023 14:39:39, jens, outliers): this is the output vector from the ransa solver, indicating inliers and outliers
             vector<bool> vbInliers;
             int nInliers;
             bool bNoMore;
@@ -3692,6 +3711,9 @@ bool Tracking::Relocalization()
             // If a Camera Pose is computed, optimize
             if(bTcw)
             {
+                // TODO(15-05-2023 14:43:18, jens, outliers): save the known outliers in the database here
+                // or maybe it is enough to add a flag to every outlier, and then simply ignore them in the optimization
+
                 Sophus::SE3f Tcw(eigTcw);
                 mCurrentFrame.SetPose(Tcw);
                 // Tcw.copyTo(mCurrentFrame.mTcw);
@@ -3704,6 +3726,7 @@ bool Tracking::Relocalization()
                 {
                     if(vbInliers[j])
                     {
+                        // FOUND(15-05-2023 14:42:11, jens, outliers): this indicates how to extract the inlier/outlier features from the frame
                         mCurrentFrame.mvpMapPoints[j]=vvpMapPointMatches[i][j];
                         sFound.insert(vvpMapPointMatches[i][j]);
                     }

@@ -52,6 +52,8 @@
 
 
 namespace ORB_SLAM3 {
+    // FOUND(15-05-2023 14:33:56, jens, frame): maybe we can use the frame to get the orb features,
+    // and thus be able to check if they are in the database of known outliers
     MLPnPsolver::MLPnPsolver(const Frame &F, const vector<MapPoint *> &vpMapPointMatches):
             mnInliersi(0), mnIterations(0), mnBestInliers(0), N(0), mpCamera(F.mpCamera){
         mvpMapPointMatches = vpMapPointMatches;
@@ -171,6 +173,8 @@ namespace ORB_SLAM3 {
 	            // If it is the best solution so far, save it
 	            if(mnInliersi>mnBestInliers)
 	            {
+                    // FOUND(15-05-2023 14:04:10, jens, inliers): this is the current best solution,
+                    // thus ultimately it is the outliers (false) values from mvbBestInliers that are to be remembered
 	                mvbBestInliers = mvbInliersi;
 	                mnBestInliers = mnInliersi;
 
@@ -188,6 +192,8 @@ namespace ORB_SLAM3 {
 
 	            if(Refine())
 	            {
+                    // FOUND(15-05-2023 14:21:28, jens, ransac): this must be where ransac "finished"
+                    // and the final outliers are to be remembered, for the next ransac solving procedure
 	                nInliers = mnRefinedInliers;
 	                vbInliers = vector<bool>(mvpMapPointMatches.size(),false);
 	                for(int i=0; i<N; i++)
@@ -207,6 +213,8 @@ namespace ORB_SLAM3 {
 	        bNoMore=true;
 	        if(mnBestInliers>=mRansacMinInliers)
 	        {
+                // FOUND(15-05-2023 14:23:08, jens, ransac): this must be where ransac "finished"
+                // and the final outliers are to be remembered, for the next ransac solving procedure
 	            nInliers=mnBestInliers;
 	            vbInliers = vector<bool>(mvpMapPointMatches.size(),false);
 	            for(int i=0; i<N; i++)
@@ -260,6 +268,7 @@ namespace ORB_SLAM3 {
 	}
 
     void MLPnPsolver::CheckInliers(){
+        // FOUND(15-05-2023 14:03:17, jens, inliers): this might be where inliers are found, and outliers can be put into memory
         mnInliersi=0;
 
         for(int i=0; i<N; i++)
@@ -287,6 +296,7 @@ namespace ORB_SLAM3 {
             }
             else
             {
+                // FOUND(15-05-2023 14:03:52, jens, outliers): this is where outliers are indicated, as false in this vector
                 mvbInliersi[i]=false;
             }
         }

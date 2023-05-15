@@ -213,6 +213,9 @@ protected:
      Eigen::Vector3f mWorldPos;
 
      // Keyframes observing the point and associated index in keyframe
+     // FOUND(15-05-2023 15:01:00, jens, mappoint): each mappoint keeps track of which keyframes have observed it
+     // if we can understand how to know whether a mappoint is in a new frame (before becoming a keyframe)
+     // we can use it to know which points we can ignore in ransac in the future
      std::map<KeyFrame*,std::tuple<int,int> > mObservations;
      // For save relation without pointer, this is necessary for save/load function
      std::map<long unsigned int, int> mBackupObservationsId1;
@@ -233,6 +236,7 @@ protected:
      int mnFound;
 
      // Bad flag (we do not currently erase MapPoint from memory)
+     // FOUND(15-05-2023 15:05:34, jens, outlier): maybe the bad flag can be used to mark outliers
      bool mbBad;
      MapPoint* mpReplaced;
      // For save relation without pointer, this is necessary for save/load function

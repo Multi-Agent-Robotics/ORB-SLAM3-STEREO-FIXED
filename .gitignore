@@ -39,7 +39,6 @@ Examples/Stereo-Inertial/stereo_inertial_tum_vi
 Examples/Stereo-Inertial/stereo_inertial_realsense_t265
 Examples/Stereo-Inertial/stereo_inertial_realsense_D435i
 
-
 Examples/ROS/ORB_SLAM3/Mono
 Examples/ROS/ORB_SLAM3/Mono_Inertial
 Examples/ROS/ORB_SLAM3/MonoAR
@@ -88,7 +87,8 @@ Table_TUMVI_rooms/
 *.pyc
 *.osa
 .idea/
-.vscode
+.vscode/*
+!.vscode/meta-comments.code-snippets
 my_settings.txt
 
 borrar/*

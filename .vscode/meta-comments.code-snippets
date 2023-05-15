@@ -1,0 +1,53 @@
+{
+	// Place your ORB-SLAM3-STEREO-FIXED workspace snippets here. Each snippet is defined under a snippet name and has a scope, prefix, body and 
+	// description. Add comma separated ids of the languages where the snippet is applicable in the scope field. If scope 
+	// is left empty or omitted, the snippet gets applied to all languages. The prefix is what is 
+	// used to trigger the snippet and the body will be expanded and inserted. Possible variables are: 
+	// $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders. 
+	// Placeholders with the same ids are connected.
+	// Example:
+	// "Print to console": {
+	// 	"scope": "javascript,typescript",
+	// 	"prefix": "log",
+	// 	"body": [
+	// 		"console.log('$1');",
+	// 		"$2"
+	// 	],
+	// 	"description": "Log output to console"
+	// }
+	"Found important part of code": {
+		"prefix": "found",
+		"body": [
+			"// FOUND($CURRENT_DATE-$CURRENT_MONTH-$CURRENT_YEAR $CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND, ${1|jens,kristoffer,jonas|}, ${2:keyword}): ${3:description}"
+		],
+		"description": "Meta comment: Important found"
+	},
+	"Question about part of code": {
+		"prefix": "question",
+		"body": [
+			"// QUESTION($CURRENT_DATE-$CURRENT_MONTH-$CURRENT_YEAR $CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND, ${1|jens,kristoffer,jonas|}, ${2:keyword}): ${3:description}"
+		],
+		"description": "Meta comment: Question"
+	},
+	"Answer to question": {
+		"prefix": "answer",
+		"body": [
+			"// ANSWER($CURRENT_DATE-$CURRENT_MONTH-$CURRENT_YEAR $CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND, ${1|jens,kristoffer,jonas|}, ${2:keyword}): ${3:description}"
+		],
+		"description": "Meta comment: Answer to question"
+	},
+	"Task to be completed": {
+		"prefix": "todo",
+		"body": [
+			"// TODO($CURRENT_DATE-$CURRENT_MONTH-$CURRENT_YEAR $CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND, ${1|jens,kristoffer,jonas|}, ${2:keyword}): ${3:description}"
+		],
+		"description": "Meta comment: Task to be completed"
+	},
+	"Comment to code or other meta comment": {
+		"prefix": "comment",
+		"body": [
+			"// COMMENT($CURRENT_DATE-$CURRENT_MONTH-$CURRENT_YEAR $CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND, ${1|jens,kristoffer,jonas|}, ${2:keyword}): ${3:description}"
+		],
+		"description": "Meta comment: Comment to code or other meta comment"
+	}
+}

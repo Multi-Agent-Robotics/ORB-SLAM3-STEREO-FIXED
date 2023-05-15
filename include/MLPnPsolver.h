@@ -55,6 +55,8 @@
 #include<Eigen/Dense>
 #include<Eigen/Sparse>
 
+// FOUND(15-05-2023 14:01:42, jens, ransac): it might be necessary to extend this class with the memory of outliers
+
 namespace ORB_SLAM3{
     class MLPnPsolver {
     public:
@@ -125,7 +127,7 @@ namespace ORB_SLAM3{
 
 
     private:
-        void CheckInliers();
+        void CheckInliers(); // FOUND(15-05-2023 14:02:12, jens, inliers): this is probably the function that needs to be extended
         bool Refine();
 
         //Functions from de original MLPnP code
@@ -205,12 +207,12 @@ namespace ORB_SLAM3{
         double mRi[3][3];
         double mti[3];
         Eigen::Matrix4f mTcwi;
-        vector<bool> mvbInliersi;
+        vector<bool> mvbInliersi; // FOUND(jens, outliers): outliers are false and inliers are true
         int mnInliersi;
 
         // Current Ransac State
         int mnIterations;
-        vector<bool> mvbBestInliers;
+        vector<bool> mvbBestInliers; // FOUND(15-05-2023 14:05:53, jens, outliers): this contains the inliers and outliers, that are considered the "solution"
         int mnBestInliers;
         Eigen::Matrix4f mBestTcw;
 
