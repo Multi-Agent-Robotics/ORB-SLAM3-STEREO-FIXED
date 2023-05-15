@@ -11,8 +11,8 @@ endfunction()
 
 printvar(CMAKE_BUILD_TYPE)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wall   -O3")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall   -O3")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O3")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O3")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
 
@@ -32,15 +32,25 @@ else()
    message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
+set(3TDPARTY_INSTALL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/install")
+printvar(3TDPARTY_INSTALL_DIR)
+
 # use the local install of OpenCV 4.2.0, to avoid conflict with the system OpenCV
 # Which on Jetpack 5.1 is OpenCV 4.5.1
 # see `./scripts/install_opencv_4.2.0.sh`
-set(OpenCV_DIR "~/.local/lib/cmake/opencv4")
+
+# /etc/nv_tegra_release
+if(EXISTS "/etc/nv_tegra_release")
+	message(STATUS "NVIDIA Jetson platform")
+	  set(OpenCV_DIR "/usr/local/lib/cmake/opencv4")
+else()
+endif()
 find_package(OpenCV 4.2.0 REQUIRED)
 
 find_package(Eigen3 3.1.0 REQUIRED)
 
 # set(Pangolin_DIR "~/.local/lib/cmake/Pangolin")
+set(Pangolin_DIR "${3TDPARTY_INSTALL_DIR}/lib/cmake/Pangolin")
 find_package(Pangolin REQUIRED)
 
 include_directories(

@@ -83,7 +83,13 @@ pushd "$DOWNLOAD_DIR/opencv-4.2.0"
 pwd
 echo "Building OpenCV 4.2.0..."
 
-CMAKE_INSTALL_PREFIX="$HOME/.local"
+# CMAKE_INSTALL_PREFIX="$HOME/.local"
+CMAKE_INSTALL_PREFIX="$THIRD_PARTY_DIR/install"
+if ! [ -d "$CMAKE_INSTALL_PREFIX" ]; then
+    mkdir -p "$CMAKE_INSTALL_PREFIX"
+    green "Creating install directory: $CMAKE_INSTALL_PREFIX"
+fi
+
 cmake -S . -B ./build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX"
 cmake --build ./build --config Release
 echo "Installing OpenCV 4.2.0... to $CMAKE_INSTALL_PREFIX" 

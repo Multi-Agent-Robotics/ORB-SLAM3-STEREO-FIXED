@@ -21,10 +21,12 @@ function hr() {
 
 function check_dependencies() {
     # And array has to be passed as a parameter
-    declare -a dependencies=("${!1}")
+    # declare -a dependencies=("${!1}")
     fail=0
 
-    for dependency in "${dependencies[@]}"; do
+    # for dependency in "${dependencies[@]}"; do
+    for dependency in "$@"; do
+    	echo -n "Checking $dependency... "
         if command -v "$dependency" &> /dev/null; then
             green "$dependency"
             echo " is installed"

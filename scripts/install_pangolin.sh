@@ -24,7 +24,12 @@ git clone --recursive --progress https://github.com/Multi-Agent-Robotics/Pangoli
 pushd Pangolin || exit 1
 ./scripts/install_prerequisites.sh recommended
 
-CMAKE_INSTALL_PREFIX="$HOME/.local"
+# CMAKE_INSTALL_PREFIX="$HOME/.local"
+CMAKE_INSTALL_PREFIX="$THIRD_PARTY_DIR/install"
+if ! [ -d "$CMAKE_INSTALL_PREFIX" ]; then
+    mkdir -p "$CMAKE_INSTALL_PREFIX"
+    green "Creating install directory: $CMAKE_INSTALL_PREFIX"
+fi
 cmake -S . -B ./build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX"
 cmake --build ./build --config Release
 
