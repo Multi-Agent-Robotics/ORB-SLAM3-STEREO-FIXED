@@ -87,7 +87,7 @@ function build_3rdparty_library() {
 
 build_3rdparty_library "DBoW2"
 build_3rdparty_library "g2o"
-build_3rdparty_library "Sophus" "install"
+build_3rdparty_library "Sophus" # "install"
 
 # pushd 3rdparty/g2o || exit 1
 # cmake -S . -B ./build -G Ninja -DCMAKE_BUILD_TYPE=Release

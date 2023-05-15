@@ -1,13 +1,16 @@
 cmake_minimum_required(VERSION 2.8)
 project(ORB_SLAM3)
 
+function(printvar var)
+  string(ASCII 27 Esc)
+  set(cyan "${Esc}[36m")
+  set(reset "${Esc}[m")
+  message(STATUS "${cyan}${var}$${re} = ${${var}}${reset}")
+endfunction()
+
 IF(NOT DEFINED CMAKE_BUILD_TYPE)
   SET(CMAKE_BUILD_TYPE Release)
 ENDIF()
-
-function(printvar var)
-  message(STATUS "${var} = ${${var}}")
-endfunction()
 
 printvar(CMAKE_BUILD_TYPE)
 
@@ -39,7 +42,7 @@ printvar(3TDPARTY_INSTALL_DIR)
 # Which on Jetpack 5.1 is OpenCV 4.5.1
 # see `./scripts/install_opencv_4.2.0.sh`
 
-# /etc/nv_tegra_release
+# https://forums.developer.nvidia.com/t/how-to-find-if-cmakelists-txt-is-residing-on-jetson-xavier/181725/4
 if(EXISTS "/etc/nv_tegra_release")
 	message(STATUS "NVIDIA Jetson platform")
 	  set(OpenCV_DIR "/usr/local/lib/cmake/opencv4")
@@ -60,16 +63,7 @@ ${PROJECT_SOURCE_DIR}/include/CameraModels
 ${PROJECT_SOURCE_DIR}/3rdparty/Sophus
 ${EIGEN3_INCLUDE_DIR}
 ${Pangolin_INCLUDE_DIRS}
-)
-
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
-
-file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
-)
-
-file(GLOB_RECURSE HEADER_FILES CONFIGURE_DEPENDS
+LES CONFIGURE_DEPENDS
   ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
 )
 
@@ -86,6 +80,8 @@ ${EIGEN3_LIBS}
 ${Pangolin_LIBRARIES}
 ${PROJECT_SOURCE_DIR}/3rdparty/DBoW2/lib/libDBoW2.so
 ${PROJECT_SOURCE_DIR}/3rdparty/g2o/lib/libg2o.so
+${PROJECT_SOURCE_DIR}/3rdparty/install/lib/libpango_windowing.so
+${PROJECT_SOURCE_DIR}/3rdparty/install/lib/libpango_image.so
 -lboost_serialization
 -lcrypto
 )
