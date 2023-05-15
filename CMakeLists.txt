@@ -32,23 +32,16 @@ else()
    message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
-# LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
-
-# TODO: include the local install of OpenCV 4.2.0
-# list(APPEND CMAKE_MODULE_PATH "~/.local/lib/cmake/opencv4")
+# use the local install of OpenCV 4.2.0, to avoid conflict with the system OpenCV
+# Which on Jetpack 5.1 is OpenCV 4.5.1
+# see `./scripts/install_opencv_4.2.0.sh`
+set(OpenCV_DIR "~/.local/lib/cmake/opencv4")
+find_package(OpenCV 4.2.0 REQUIRED)
 
 find_package(Eigen3 3.1.0 REQUIRED)
 
 # set(Pangolin_DIR "~/.local/lib/cmake/Pangolin")
 find_package(Pangolin REQUIRED)
-
-# use the local install of OpenCV 4.2.0, to avoid conflict with the system OpenCV
-# Which on Jetpack 5.1 is OpenCV 4.5.1
-# see `./scripts/install_opencv_4.2.0.sh`
-
-set(OpenCV_DIR "~/.local/lib/cmake/opencv4")
-find_package(OpenCV 4.2.0 REQUIRED)
-# find_package(realsense2) # We do not use realsense camera
 
 include_directories(
 ${PROJECT_SOURCE_DIR}
@@ -87,3 +80,9 @@ ${PROJECT_SOURCE_DIR}/3rdparty/g2o/lib/libg2o.so
 -lcrypto
 )
 
+
+# install public headers
+install(DIRECTORY include/
+  DESTINATION include
+  # FILES_MATCHING PATTERN "*.h"
+)
