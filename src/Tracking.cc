@@ -3649,6 +3649,7 @@ bool Tracking::Relocalization()
             // FOUND(15-05-2023 13:58:10, jens, currentframe): it might be that we need to prune from the current frame mCurrentFrame instead
             // QUESTION(15-05-2023 14:02:36, jens, currentframe): do we want to remove the features from the frame or simply make sure not to use them in the solver?
             // ANSWER(15-05-2023 14:02:10, jens, currentframe): we dont know outliers before starting the ransac solver, so we cant do anything here at all
+            // FOUND(17-05-2023 09:42:54, jens, matches): vvpMapPointMatches is output, all matches between keyframe and currentframe
             int nmatches = matcher.SearchByBoW(pKF,mCurrentFrame,vvpMapPointMatches[i]);
             if(nmatches<15)
             {
@@ -3669,6 +3670,11 @@ bool Tracking::Relocalization()
                 // TODO(15-05-2023 14:36:26, jens, outliers):
                 // 1. implement database of known outliers
                 // 2. return the outliers from the ransac solver ()
+
+                // TODO(17-05-2023 10:02:25, jens, filter): filtering bas points (outliers) from vvpMapPointMatches,
+                // before giving them to the solver
+                // TODO(17-05-2023 10:03:05, jens, remember): the MLPnPsolver is the actor who needs to be responsible for
+                // remembering outliers
                 MLPnPsolver* pSolver = new MLPnPsolver(mCurrentFrame,vvpMapPointMatches[i]);
                 pSolver->SetRansacParameters(0.99,10,300,6,0.5,5.991);  //This solver needs at least 6 points
                 vpMLPnPsolvers[i] = pSolver;
@@ -3699,6 +3705,10 @@ bool Tracking::Relocalization()
 
             MLPnPsolver* pSolver = vpMLPnPsolvers[i];
             Eigen::Matrix4f eigTcw;
+            // TODO(17-05-2023 10:04:12, jens, remember): the list of outliers could be given as an output argument
+            // to psolver->iterate.
+            // COMMENT(17-05-2023 10:05:03, jens, forget): somehow the outliers needs to be forgotten after
+            // X frames
             bool bTcw = pSolver->iterate(5,bNoMore,vbInliers,nInliers, eigTcw);
 
             // If Ransac reachs max. iterations discard keyframe
