@@ -28,7 +28,6 @@ set(HIDDEN "${ESC}[8m")
 
 function(printvar var)
   # if var is a list of variables, print each one recursively
-  
   # if var is empty or undefined, print in red
   if(NOT DEFINED ${var} OR "${${var}}" STREQUAL "")
     message(STATUS "${RED}${var}${RESET} = <empty>")
@@ -38,9 +37,12 @@ function(printvar var)
 endfunction()
 
 function(printlist var)
-  message(STATUS "${GREEN}${var}${RESET} =")
+  list(LENGTH ${var} COUNT)
+  message(STATUS "${GREEN}${var}${RESET} = (${CYAN}${COUNT}${RESET} elements)")
+  set(i 0)
   foreach(f ${${var}})
-    message(STATUS "  ${f}")
+    message(STATUS " ${i}. ${f}")
+    math(EXPR i "${i} + 1")
   endforeach()
 endfunction()
 
@@ -306,6 +308,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 add_subdirectory(3rdparty/g2o)
+
+printlist(Pangolin_LIBRARIES)
 
 target_link_libraries(${PROJECT_NAME}
 ${OpenCV_LIBS}
