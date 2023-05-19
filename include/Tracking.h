@@ -39,6 +39,9 @@
 
 #include "CameraModels/GeometricCamera.h"
 
+// ADDED(19-05-2023 14:47:11, jens, outlier): circular buffer for outlier memory
+#include "CircularBuffer.h"
+
 #include <mutex>
 #include <unordered_set>
 
@@ -365,6 +368,11 @@ protected:
     bool mbNotStop;
     std::mutex mMutexStop;
 #endif
+
+    // ADDED(19-05-2023 14:42:46, jens, outlier): remember outliers from earlier frames
+    // ADDED(19-05-2023 14:48:02, jens, outlier): circular buffer for outlier memory, memory size 10 frames
+    CircularBuffer<vectpr<MapPoint*>, 10> outlier_memory;
+    // vector<vector<MapPoint*>> outlier_database;
 
 public:
     cv::Mat mImRight;
