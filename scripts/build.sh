@@ -118,6 +118,8 @@ hr -
 green "Configuring and building ORB_SLAM3 ...\n"
 cmake -S . -B ./build -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build ./build
+test -d ~/.local || mkdir -p ~/.local
+CMAKE_INSTALL_PREFIX=~/.local cmake --build ./build --target install
 green "Configuring and building ORB_SLAM3 DONE\n"
 
 green "All done :D\n"
