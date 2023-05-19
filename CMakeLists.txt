@@ -113,11 +113,14 @@ ${PROJECT_SOURCE_DIR}/3rdparty/g2o/lib/libg2o.so
 
 print_target_information(${PROJECT_NAME})
 
+
+
 # install public headers
 install(DIRECTORY include/
   DESTINATION include
 )
 
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_PROJECT_SOURCE_DIR}/lib)
 install(TARGETS ${PROJECT_NAME}
   DESTINATION lib
 )

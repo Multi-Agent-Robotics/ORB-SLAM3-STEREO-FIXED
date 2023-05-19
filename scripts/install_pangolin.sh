@@ -19,7 +19,7 @@ else
 	green "Installing Pangolin...\n"
 	# Use our fork of Pangolin
 	git clone --recursive --progress https://github.com/Multi-Agent-Robotics/Pangolin.git
-	.Pangolin/scripts/install_prerequisites.sh recommended
+	./Pangolin/scripts/install_prerequisites.sh recommended
 fi
 
 pushd Pangolin || exit 1
