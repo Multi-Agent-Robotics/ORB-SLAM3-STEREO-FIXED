@@ -87,7 +87,20 @@ function build_3rdparty_library() {
 
 build_3rdparty_library "DBoW2"
 build_3rdparty_library "g2o"
-build_3rdparty_library "Sophus" # "install"
+# build_3rdparty_library "Sophus" # "install"
+pushd "$THIRD_PARTY_DIR/Sophus" || exit 1
+CMAKE_INSTALL_PREFIX="$THIRD_PARTY_DIR/install"
+if ! [ -d "$CMAKE_INSTALL_PREFIX" ]; then
+    mkdir -p "$CMAKE_INSTALL_PREFIX"
+    green "Creating install directory: $CMAKE_INSTALL_PREFIX\n"
+fi
+
+echo "CMAKE_INSTALL_PREFIX: $CMAKE_INSTALL_PREFIX"
+cmake -S . -B ./build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX"
+cmake --build ./build
+cmake --build ./build --target install
+
+popd
 
 # pushd 3rdparty/g2o || exit 1
 # cmake -S . -B ./build -G Ninja -DCMAKE_BUILD_TYPE=Release
