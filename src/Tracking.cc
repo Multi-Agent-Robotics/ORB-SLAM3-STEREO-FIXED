@@ -3698,8 +3698,9 @@ bool Tracking::Relocalization()
             // FOUND(15-05-2023 14:00:52, jens, ransac): run ransac - this must be where the outlier memory will need to be implemented
 
             // Perform 5 Ransac Iterations
-            // FOUND(15-05-2023 14:39:39, jens, outliers): this is the output vector from the ransa solver, indicating inliers and outliers
+            // FOUND(15-05-2023 14:39:39, jens, outliers): this is the output vector from the ransac solver, indicating inliers and outliers
             vector<bool> vbInliers;
+            vector<MapPoint*> outlier_features; // ADDED(19-05-2023 14:26:23, jens, outlier): list of outliers from the ransac solver
             int nInliers;
             bool bNoMore;
 
@@ -3709,7 +3710,8 @@ bool Tracking::Relocalization()
             // to psolver->iterate.
             // COMMENT(17-05-2023 10:05:03, jens, forget): somehow the outliers needs to be forgotten after
             // X frames
-            bool bTcw = pSolver->iterate(5,bNoMore,vbInliers,nInliers, eigTcw);
+            bool bTcw = pSolver->iterate(5, bNoMore, vbInliers, nInliers, eigTcw, outlier_features);
+            outlier_memory.push_back(outlier_features); // ADDED(19-05-2023 14:51:00, jens, outlier): add the outliers to the memory
 
             // If Ransac reachs max. iterations discard keyframe
             if(bNoMore)

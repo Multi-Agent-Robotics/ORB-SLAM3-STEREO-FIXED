@@ -45,13 +45,16 @@ if(EXISTS "/etc/nv_tegra_release")
 	  message(STATUS "Host is NVIDIA Jetson")
 	  set(OpenCV_DIR "/usr/local/lib/cmake/opencv4")
 endif()
-find_package(OpenCV 4.2.0 REQUIRED)
 
+list(PREPEND CMAKE_PREFIX_PATH "${3RDPARTY_INSTALL_DIR}")
+
+find_package(OpenCV 4.2.0 REQUIRED)
 find_package(Eigen3 3.1.0 REQUIRED)
 
 # set(Pangolin_DIR "~/.local/lib/cmake/Pangolin")
 # set(Pangolin_DIR "${3RDPARTY_INSTALL_DIR}/lib/cmake/Pangolin")
 find_package(Pangolin REQUIRED)
+find_package(Sophus REQUIRED)
 
 # include_directories(
 # ${PROJECT_SOURCE_DIR}
@@ -116,11 +119,11 @@ print_target_information(${PROJECT_NAME})
 
 
 # install public headers
-install(DIRECTORY include/
-  DESTINATION include
-)
+# install(DIRECTORY include/
+#   DESTINATION ${CMAKE_PROJECT_SOURCE_DIR}/include
+# )
 
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_PROJECT_SOURCE_DIR}/lib)
-install(TARGETS ${PROJECT_NAME}
-  DESTINATION lib
-)
+# set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_PROJECT_SOURCE_DIR}/lib)
+# install(TARGETS ${PROJECT_NAME}
+#   DESTINATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+# )

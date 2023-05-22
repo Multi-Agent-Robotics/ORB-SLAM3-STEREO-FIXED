@@ -99,7 +99,8 @@ namespace ORB_SLAM3 {
     }
 
     //RANSAC methods
-    bool MLPnPsolver::iterate(int nIterations, bool &bNoMore, vector<bool> &vbInliers, int &nInliers, Eigen::Matrix4f &Tout){
+    // ADDED(19-05-2023 14:36:29, jens, outliers): output outlier list
+    bool MLPnPsolver::iterate(int nIterations, bool &bNoMore, vector<bool> &vbInliers, int &nInliers, Eigen::Matrix4f &Tout, vector<MapPoint*> &outlier_features){
         Tout.setIdentity();
         bNoMore = false;
 	    vbInliers.clear();
