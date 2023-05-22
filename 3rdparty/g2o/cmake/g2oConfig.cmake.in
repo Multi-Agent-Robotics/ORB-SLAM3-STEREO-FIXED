@@ -1,0 +1,6 @@
+@PACKAGE_INIT@
+
+include(${CMAKE_CURRENT_LIST_DIR}/g2o.cmake)
+set_and_check(g2o_INCLUDE_DIR "@PACKAGE_CMAKE_INSTALL_INCLUDEDIR@")
+set(g2o_LIBRARIES g2o::g2o)
+check_required_components(g2o)
