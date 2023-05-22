@@ -16,12 +16,12 @@
 * If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "KeyFrame.h"
-#include "Converter.h"
-#include "ImuTypes.h"
-#include<mutex>
+#include "orbslam3/KeyFrame.h"
+#include "orbslam3/Converter.h"
+#include "orbslam3/ImuTypes.h"
+#include <mutex>
 
-namespace ORB_SLAM3
+namespace orbslam3
 {
 
 long unsigned int KeyFrame::nNextId=0;

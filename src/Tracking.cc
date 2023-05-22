@@ -17,17 +17,17 @@
 */
 
 
-#include "Tracking.h"
+#include "orbslam3/Tracking.h"
 
-#include "ORBmatcher.h"
-#include "FrameDrawer.h"
-#include "Converter.h"
-#include "G2oTypes.h"
-#include "Optimizer.h"
-#include "CameraModels/Pinhole.h"
-#include "CameraModels/KannalaBrandt8.h"
-#include "MLPnPsolver.h"
-#include "GeometricTools.h"
+#include "orbslam3/ORBmatcher.h"
+#include "orbslam3/FrameDrawer.h"
+#include "orbslam3/Converter.h"
+#include "orbslam3/G2oTypes.h"
+#include "orbslam3/Optimizer.h"
+#include "orbslam3/CameraModels/Pinhole.h"
+#include "orbslam3/CameraModels/KannalaBrandt8.h"
+#include "orbslam3/MLPnPsolver.h"
+#include "orbslam3/GeometricTools.h"
 
 #include <iostream>
 
@@ -37,7 +37,7 @@
 
 using namespace std;
 
-namespace ORB_SLAM3
+namespace orbslam3
 {
 
 
@@ -4014,7 +4014,7 @@ void Tracking::UpdateFrameIMU(const float s, const IMU::Bias &b, KeyFrame* pCurr
 {
     Map * pMap = pCurrentKeyFrame->GetMap();
     unsigned int index = mnFirstFrameId;
-    list<ORB_SLAM3::KeyFrame*>::iterator lRit = mlpReferences.begin();
+    list<orbslam3::KeyFrame*>::iterator lRit = mlpReferences.begin();
     list<bool>::iterator lbL = mlbLost.begin();
     for(auto lit=mlRelativeFramePoses.begin(),lend=mlRelativeFramePoses.end();lit!=lend;lit++, lRit++, lbL++)
     {

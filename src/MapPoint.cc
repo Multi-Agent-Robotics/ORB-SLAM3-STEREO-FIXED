@@ -16,12 +16,12 @@
 * If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "MapPoint.h"
-#include "ORBmatcher.h"
+#include "orbslam3/MapPoint.h"
+#include "orbslam3/ORBmatcher.h"
 
-#include<mutex>
+#include <mutex>
 
-namespace ORB_SLAM3
+namespace orbslam3
 {
 
 long unsigned int MapPoint::nNextId=0;

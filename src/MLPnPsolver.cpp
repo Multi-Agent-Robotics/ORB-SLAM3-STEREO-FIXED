@@ -46,12 +46,12 @@
 * SUCH DAMAGE.                                                               *
 ******************************************************************************/
 
-#include "MLPnPsolver.h"
+#include "orbslam3/MLPnPsolver.h"
 
 #include <Eigen/Sparse>
 
 
-namespace ORB_SLAM3 {
+namespace orbslam3 {
     // FOUND(15-05-2023 14:33:56, jens, frame): maybe we can use the frame to get the orb features,
     // and thus be able to check if they are in the database of known outliers
     MLPnPsolver::MLPnPsolver(const Frame &F, const vector<MapPoint *> &vpMapPointMatches):

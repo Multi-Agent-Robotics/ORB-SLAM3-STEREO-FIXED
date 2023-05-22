@@ -16,10 +16,10 @@
 * If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "G2oTypes.h"
-#include "ImuTypes.h"
-#include "Converter.h"
-namespace ORB_SLAM3
+#include "orbslam3/G2oTypes.h"
+#include "orbslam3/ImuTypes.h"
+#include "orbslam3/Converter.h"
+namespace orbslam3
 {
 
 ImuCamPose::ImuCamPose(KeyFrame *pKF):its(0)

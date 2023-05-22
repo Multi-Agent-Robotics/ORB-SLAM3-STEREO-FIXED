@@ -17,19 +17,19 @@
 */
 
 
-#include "LoopClosing.h"
+#include "orbslam3/LoopClosing.h"
 
-#include "Sim3Solver.h"
-#include "Converter.h"
-#include "Optimizer.h"
-#include "ORBmatcher.h"
-#include "G2oTypes.h"
+#include "orbslam3/Sim3Solver.h"
+#include "orbslam3/Converter.h"
+#include "orbslam3/Optimizer.h"
+#include "orbslam3/ORBmatcher.h"
+#include "orbslam3/G2oTypes.h"
 
-#include<mutex>
-#include<thread>
+#include <mutex>
+#include <thread>
 
 
-namespace ORB_SLAM3
+namespace orbslam3
 {
 
 LoopClosing::LoopClosing(Atlas *pAtlas, KeyFrameDatabase *pDB, ORBVocabulary *pVoc, const bool bFixScale, const bool bActiveLC):

@@ -17,11 +17,11 @@
 */
 
 
-#include "Map.h"
+#include "orbslam3/Map.h"
 
-#include<mutex>
+#include <mutex>
 
-namespace ORB_SLAM3
+namespace orbslam3
 {
 
 long unsigned int Map::nNextId=0;
@@ -491,4 +491,4 @@ void Map::PostLoad(KeyFrameDatabase* pKFDB, ORBVocabulary* pORBVoc/*, map<long u
 }
 
 
-} //namespace ORB_SLAM3
+} //namespace orbslam3

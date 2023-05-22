@@ -16,14 +16,14 @@
 * If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "Atlas.h"
-#include "Viewer.h"
+#include "orbslam3/Atlas.h"
+#include "orbslam3/Viewer.h"
 
-#include "CameraModels/GeometricCamera.h"
-#include "CameraModels/Pinhole.h"
-#include "CameraModels/KannalaBrandt8.h"
+#include "orbslam3/CameraModels/GeometricCamera.h"
+#include "orbslam3/CameraModels/Pinhole.h"
+#include "orbslam3/CameraModels/KannalaBrandt8.h"
 
-namespace ORB_SLAM3
+namespace orbslam3
 {
 
 Atlas::Atlas(){
@@ -410,4 +410,4 @@ map<long unsigned int, KeyFrame*> Atlas::GetAtlasKeyframes()
     return mpIdKFs;
 }
 
-} //namespace ORB_SLAM3
+} //namespace orbslam3

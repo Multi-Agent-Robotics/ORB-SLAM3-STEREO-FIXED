@@ -16,12 +16,12 @@
 * If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "Settings.h"
+#include "orbslam3/Settings.h"
 
-#include "CameraModels/Pinhole.h"
-#include "CameraModels/KannalaBrandt8.h"
+#include "orbslam3/CameraModels/Pinhole.h"
+#include "orbslam3/CameraModels/KannalaBrandt8.h"
 
-#include "System.h"
+#include "orbslam3/System.h"
 
 #include <opencv2/core/persistence.hpp>
 #include <opencv2/core/eigen.hpp>
@@ -30,7 +30,7 @@
 
 using namespace std;
 
-namespace ORB_SLAM3 {
+namespace orbslam3 {
 
     template<>
     float Settings::readParameter<float>(cv::FileStorage& fSettings, const std::string& name, bool& found, const bool required){

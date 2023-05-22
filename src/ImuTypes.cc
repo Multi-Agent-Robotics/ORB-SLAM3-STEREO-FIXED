@@ -16,14 +16,14 @@
 * If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ImuTypes.h"
-#include "Converter.h"
+#include "orbslam3/ImuTypes.h"
+#include "orbslam3/Converter.h"
 
-#include "GeometricTools.h"
+#include "orbslam3/GeometricTools.h"
 
-#include<iostream>
+#include <iostream>
 
-namespace ORB_SLAM3
+namespace orbslam3
 {
 
 namespace IMU

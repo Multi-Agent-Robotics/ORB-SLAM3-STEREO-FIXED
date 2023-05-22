@@ -17,9 +17,9 @@
 */
 
 
-#include "Config.h"
+#include "orbslam3/Config.h"
 
-namespace ORB_SLAM3
+namespace orbslam3
 {
 
 bool ConfigParser::ParseConfigFile(std::string &strConfigFile)

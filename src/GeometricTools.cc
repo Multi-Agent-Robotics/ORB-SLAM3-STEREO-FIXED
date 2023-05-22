@@ -16,11 +16,11 @@
 * If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "GeometricTools.h"
+#include "orbslam3/GeometricTools.h"
 
-#include "KeyFrame.h"
+#include "orbslam3/KeyFrame.h"
 
-namespace ORB_SLAM3
+namespace orbslam3
 {
 
 Eigen::Matrix3f GeometricTools::ComputeF12(KeyFrame* &pKF1, KeyFrame* &pKF2)

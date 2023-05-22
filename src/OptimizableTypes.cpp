@@ -16,9 +16,9 @@
 * If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "OptimizableTypes.h"
+#include "orbslam3/OptimizableTypes.h"
 
-namespace ORB_SLAM3 {
+namespace orbslam3 {
     bool EdgeSE3ProjectXYZOnlyPose::read(std::istream& is){
         for (int i=0; i<2; i++){
             is >> _measurement[i];

@@ -99,6 +99,10 @@ find_package(g2o REQUIRED)
 find_package(Sophus REQUIRED)
 find_package(Pangolin REQUIRED)
 
+# find the boost serialization library
+find_package(Boost REQUIRED COMPONENTS serialization)
+
+
 function(assert_target_exists target)
     if(NOT TARGET ${target})
         message(FATAL_ERROR "Target ${target} does not exist")
@@ -140,7 +144,8 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     DBoW2::DBoW2
     g2o::g2o
     ${Sophus_LIBRARIES}
-    -lboost_serialization
+    # -lboost_serialization
+    Boost::serialization
     -lcrypto
 )
 
@@ -160,6 +165,7 @@ target_compile_options(${PROJECT_NAME} PRIVATE
     -Wno-sign-compare
     -Wno-maybe-uninitialized
     -Wno-deprecated-copy
+    -Wno-deprecated
     -Wno-reorder
     -Wno-unused-but-set-variable
 )
