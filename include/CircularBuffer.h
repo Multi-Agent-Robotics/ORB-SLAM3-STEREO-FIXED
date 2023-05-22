@@ -6,19 +6,23 @@
 #include <numeric>
 #include <stdexcept>
 #include <vector>
+#include <optional>
 
 template <typename T, std::size_t N> class CircularBuffer {
   public:
-    explicit CircularBuffer() : head(0), tail(0), count(0), sum(0.0) {}
+    explicit CircularBuffer() : head(0), tail(0), count(0) {}
 
-    auto push_back(const T &value) -> void {
+    auto push_back(const T &value) -> std::optional<T> {
+        auto out = std::optional<T>();
+
         if (count < N) {
-            sum += value;
+            out = std::nullopt;
         } else {
-            sum -= buffer[head];
-            sum += value;
+            out std::make_optional<T>(buffer[tail]);
+
             head = (head + 1) % N;
         }
+
 
         buffer[tail] = value;
         tail = (tail + 1) % N;
@@ -26,6 +30,8 @@ template <typename T, std::size_t N> class CircularBuffer {
         if (count < N) {
             ++count;
         }
+
+        return out;
     }
 
     auto operator[](std::size_t index) -> T & {

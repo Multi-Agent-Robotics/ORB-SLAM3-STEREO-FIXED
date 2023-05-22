@@ -3671,10 +3671,33 @@ bool Tracking::Relocalization()
                 // 1. implement database of known outliers
                 // 2. return the outliers from the ransac solver ()
 
-                // TODO(17-05-2023 10:02:25, jens, filter): filtering bas points (outliers) from vvpMapPointMatches,
+                // TODO(17-05-2023 10:02:25, jens, filter): filtering bad points (outliers) from vvpMapPointMatches,
                 // before giving them to the solver
                 // TODO(17-05-2023 10:03:05, jens, remember): the MLPnPsolver is the actor who needs to be responsible for
                 // remembering outliers
+                
+                // ADDED(22-05-2023 09:31:20, jens, filtering): outliers being filtered from vvpMapPointMatches before ransac
+                // filtering known outliers from vvpMapPointMatches
+                // every outlier in the circular buffer is a known outlier
+                for (auto mappoint : vvpMapPointMatches[i]) {
+                    // for each entry of mappoint lists in the circular buffer
+                    // check each mappoint if it is a known outlier
+                    // if it is a known outlier, remove it from vvMapPointMatches
+
+                    for (auto frame_outliers : outlier_memory) {
+                        // for each frame_outliers in the circular buffer
+                        // check if the mappoint is in the frame_outliers
+                        // if it is, remove it from vvMapPointMatches
+                        // if it is not, continue
+                        if (frame_outliers.find(mappoint) != frame_outliers.end()) {
+                            // if the mappoint is in the frame_outliers
+                            // remove it from vvMapPointMatches
+                            vvpMapPointMatches[i].erase(std::remove(vvpMapPointMatches[i].begin(), vvpMapPointMatches[i].end(), mappoint), vvpMapPointMatches[i].end());
+                        }
+                    }
+                }
+                // ----------------------------------------------------------------------------------------------
+
                 MLPnPsolver* pSolver = new MLPnPsolver(mCurrentFrame,vvpMapPointMatches[i]);
                 pSolver->SetRansacParameters(0.99,10,300,6,0.5,5.991);  //This solver needs at least 6 points
                 vpMLPnPsolvers[i] = pSolver;
@@ -3710,8 +3733,28 @@ bool Tracking::Relocalization()
             // to psolver->iterate.
             // COMMENT(17-05-2023 10:05:03, jens, forget): somehow the outliers needs to be forgotten after
             // X frames
+            // ADDED(22-05-2023 09:35:18, jens, outlier): outlier_featues output argument from the ransac solver
             bool bTcw = pSolver->iterate(5, bNoMore, vbInliers, nInliers, eigTcw, outlier_features);
-            outlier_memory.push_back(outlier_features); // ADDED(19-05-2023 14:51:00, jens, outlier): add the outliers to the memory
+
+            // ADDED(22-05-2023 09:33:30, jens, register): registering outliers and remembering them
+            // the outlier_features are to be registered as outliers
+            for (auto mappoint : outlier_features) {
+                mappoint->registeres_outlier = true;
+            }
+
+            // ADDED(19-05-2023 14:51:00, jens, outlier): add the outliers to the memory
+            auto optional_outlier_forget = outlier_memory.push_back(outlier_features);
+
+            // ADDED(22-05-2023 09:34:41, jens, forget): forgetting the outliers coming out the other end of the circular buffer
+            // the optional output from the outlier_memory.push_back is a list of outliers to forget
+            if (optional_outlier_forget.has_value()) {
+                auto outlier_forget = optional_outlier_forget.value();
+
+                for (auto mappoint : outlier_forget) {
+                    mappoint->registeres_outlier = false;
+                }
+            }
+            // -----------------------------------------------------------------------------------------
 
             // If Ransac reachs max. iterations discard keyframe
             if(bNoMore)
