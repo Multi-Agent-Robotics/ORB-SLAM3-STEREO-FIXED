@@ -29,7 +29,8 @@
 
 #include "optimizable_graph.h"
 #include "creators.h"
-#include "../stuff/macros.h"
+// #include "../stuff/macros.h"
+#include "stuff/macros.h"
 
 #include <Eigen/Core>
 #include <Eigen/Dense>
@@ -112,7 +113,8 @@ namespace g2o {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
-#include "base_vertex.hpp"
+// #include "base_vertex.hpp"
+#include "core/base_vertex.h"
 
 } // end namespace g2o
 

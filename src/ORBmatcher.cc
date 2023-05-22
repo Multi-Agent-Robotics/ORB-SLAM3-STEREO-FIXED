@@ -17,19 +17,19 @@
 */
 
 
-#include "ORBmatcher.h"
+#include "orbslam3/ORBmatcher.h"
 
-#include<limits.h>
+#include <limits.h>
 
-#include<opencv2/core/core.hpp>
+#include <opencv2/core/core.hpp>
 
-#include "3rdparty/DBoW2/DBoW2/FeatureVector.h"
+#include <DBoW2/FeatureVector.h>
 
-#include<stdint-gcc.h>
+#include <stdint-gcc.h>
 
 using namespace std;
 
-namespace ORB_SLAM3
+namespace orbslam3
 {
 
     const int ORBmatcher::TH_HIGH = 100;

@@ -1,0 +1,8 @@
+@PACKAGE_INIT@
+
+#include(${CMAKE_CURRENT_LIST_DIR}/DBoW2.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/../DBoW2Targets/DBoW2Targets.cmake)
+set_and_check(DBoW2_INCLUDE_DIR "@PACKAGE_CMAKE_INSTALL_INCLUDEDIR@")
+set(DBoW2_LIBRARIES DBoW2::DBoW2)
+#set(DBoW2_)
+check_required_components(DBoW2)

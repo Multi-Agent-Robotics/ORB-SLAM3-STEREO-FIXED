@@ -32,7 +32,8 @@
 
 #include "base_edge.h"
 #include "robust_kernel.h"
-#include "../../config.h"
+// #include "../../config.h"
+#include "config.h"
 
 namespace g2o {
 
@@ -112,7 +113,7 @@ namespace g2o {
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   };
 
-#include "base_binary_edge.hpp"
+#include "core/base_binary_edge.hpp"
 
 } // end namespace g2o
 

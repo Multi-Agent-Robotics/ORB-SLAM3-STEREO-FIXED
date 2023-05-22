@@ -17,13 +17,13 @@
 */
 
 
-#include "Viewer.h"
+#include "orbslam3/Viewer.h"
 #include <pangolin/pangolin.h>
 
 #include <mutex>
 #include <string>
 
-namespace ORB_SLAM3
+namespace orbslam3
 {
 
 Viewer::Viewer(System* pSystem, FrameDrawer *pFrameDrawer, MapDrawer *pMapDrawer, Tracking *pTracking, const string &strSettingPath, Settings* settings):

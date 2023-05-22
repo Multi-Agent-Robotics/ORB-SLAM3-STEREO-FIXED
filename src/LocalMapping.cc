@@ -17,17 +17,17 @@
 */
 
 
-#include "LocalMapping.h"
-#include "LoopClosing.h"
-#include "ORBmatcher.h"
-#include "Optimizer.h"
-#include "Converter.h"
-#include "GeometricTools.h"
+#include "orbslam3/LocalMapping.h"
+#include "orbslam3/LoopClosing.h"
+#include "orbslam3/ORBmatcher.h"
+#include "orbslam3/Optimizer.h"
+#include "orbslam3/Converter.h"
+#include "orbslam3/GeometricTools.h"
 
-#include<mutex>
-#include<chrono>
+#include <mutex>
+#include <chrono>
 
-namespace ORB_SLAM3
+namespace orbslam3
 {
 
 LocalMapping::LocalMapping(System* pSys, Atlas *pAtlas, const float bMonocular, bool bInertial, const string &_strSeqName):

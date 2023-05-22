@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 3.16.3) # default for Ubuntu 20.04
 project(Sophus VERSION 1.1.0)
 
 include(CMakePackageConfigHelpers)

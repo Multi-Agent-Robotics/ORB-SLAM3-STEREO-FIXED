@@ -16,21 +16,21 @@
 * If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "Frame.h"
+#include "orbslam3/Frame.h"
 
-#include "G2oTypes.h"
-#include "MapPoint.h"
-#include "KeyFrame.h"
-#include "ORBextractor.h"
-#include "Converter.h"
-#include "ORBmatcher.h"
-#include "CameraModels/GeometricCamera.h"
-#include "CameraModels/Pinhole.h"
-#include "CameraModels/KannalaBrandt8.h"
+#include "orbslam3/G2oTypes.h"
+#include "orbslam3/MapPoint.h"
+#include "orbslam3/KeyFrame.h"
+#include "orbslam3/ORBextractor.h"
+#include "orbslam3/Converter.h"
+#include "orbslam3/ORBmatcher.h"
+#include "orbslam3/CameraModels/GeometricCamera.h"
+#include "orbslam3/CameraModels/Pinhole.h"
+#include "orbslam3/CameraModels/KannalaBrandt8.h"
 
 #include <thread>
 
-namespace ORB_SLAM3
+namespace orbslam3
 {
 
 long unsigned int Frame::nNextId=0;

@@ -59,13 +59,13 @@
 #include <vector>
 #include <iostream>
 
-#include "ORBextractor.h"
+#include "orbslam3/ORBextractor.h"
 
 
 using namespace cv;
 using namespace std;
 
-namespace ORB_SLAM3
+namespace orbslam3
 {
 
     const int PATCH_SIZE = 31;

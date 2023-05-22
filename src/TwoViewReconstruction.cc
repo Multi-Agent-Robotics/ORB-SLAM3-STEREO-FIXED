@@ -16,18 +16,19 @@
 * If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "TwoViewReconstruction.h"
+#include "orbslam3/TwoViewReconstruction.h"
 
-#include "Converter.h"
-#include "GeometricTools.h"
+#include "orbslam3/Converter.h"
+#include "orbslam3/GeometricTools.h"
 
-#include "3rdparty/DBoW2/DUtils/Random.h"
+// #include "3rdparty/DBoW2/DUtils/Random.h"
+#include <DBoW2/DUtils/Random.h>
 
-#include<thread>
+#include <thread>
 
 
 using namespace std;
-namespace ORB_SLAM3
+namespace orbslam3
 {
     TwoViewReconstruction::TwoViewReconstruction(const Eigen::Matrix3f& k, float sigma, int iterations)
     {

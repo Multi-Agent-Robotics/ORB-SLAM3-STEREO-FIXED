@@ -17,16 +17,18 @@
 */
 
 
-#include "KeyFrameDatabase.h"
+#include "orbslam3/KeyFrameDatabase.h"
 
-#include "KeyFrame.h"
-#include "3rdparty/DBoW2/DBoW2/BowVector.h"
+#include "orbslam3/KeyFrame.h"
+// #include "3rdparty/DBoW2/DBoW2/BowVector.h"
 
-#include<mutex>
+#include <DBoW2/BowVector.h>
+
+#include <mutex>
 
 using namespace std;
 
-namespace ORB_SLAM3
+namespace orbslam3
 {
 
 KeyFrameDatabase::KeyFrameDatabase (const ORBVocabulary &voc):

@@ -16,9 +16,9 @@
 * If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "Converter.h"
+#include "orbslam3/Converter.h"
 
-namespace ORB_SLAM3
+namespace orbslam3
 {
 
 std::vector<cv::Mat> Converter::toDescriptorVector(const cv::Mat &Descriptors)
