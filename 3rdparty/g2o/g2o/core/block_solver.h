@@ -32,7 +32,8 @@
 #include "sparse_block_matrix.h"
 #include "sparse_block_matrix_diagonal.h"
 #include "openmp_mutex.h"
-#include "../../config.h"
+// #include "../../config.h"
+#include "config.h"
 
 namespace g2o {
   using namespace Eigen;
@@ -187,7 +188,7 @@ namespace g2o {
 
 } // end namespace
 
-#include "block_solver.hpp"
+#include "core/block_solver.hpp"
 
 
 #endif

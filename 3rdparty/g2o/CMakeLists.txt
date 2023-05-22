@@ -118,7 +118,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${g2o_C_FLAGS}")
 
 # Generate config.h
 set(G2O_CXX_COMPILER "${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER}")
-configure_file(config.h.in ${g2o_SOURCE_DIR}/config.h)
+configure_file(g2o/config.h.in ${g2o_SOURCE_DIR}/g2o/config.h)
 
 
 
@@ -235,8 +235,13 @@ install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets)
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/g2o>
+    # $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/g2o>
+    $<INSTALL_INTERFACE:include/g2o>
+    $<INSTALL_INTERFACE:include/g2o/core>
+    $<INSTALL_INTERFACE:include/g2o/stuff>
+    $<INSTALL_INTERFACE:include/g2o/solvers>
+    $<INSTALL_INTERFACE:include/g2o/types>
     ${EIGEN3_INCLUDE_DIR}
 )
 
@@ -284,13 +289,20 @@ install(FILES
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
 
-install(FILES config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
+# install(FILES config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
 
 # Install header files
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/g2o
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-  FILES_MATCHING PATTERN "*.h"
-)
+foreach(extension in h hpp)
+    install(DIRECTORY g2o
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        FILES_MATCHING PATTERN "*.${extension}"
+    )    
+endforeach()
+
+# install(DIRECTORY g2o
+#   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+#   FILES_MATCHING PATTERN "*.h"
+# )
 
 
 # install(

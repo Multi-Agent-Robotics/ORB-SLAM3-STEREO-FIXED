@@ -123,7 +123,6 @@ target_sources(${PROJECT_NAME} PRIVATE
   ${HEADER_FILES}
 )
 
-
 printlist(g2o_INCLUDE_DIR)
 printlist(g2o_LIBRARIES)
 printlist(DBoW2_INCLUDE_DIR)
@@ -132,8 +131,6 @@ printlist(Sophus_INCLUDE_DIR)
 printlist(Sophus_LIBRARIES)
 printlist(Pangolin_INCLUDE_DIR)
 printlist(Pangolin_LIBRARIES)
-
-
 
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
@@ -147,35 +144,11 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     -lcrypto
 )
 
-# TODO: remove duplicate include_directories
 target_include_directories(${PROJECT_NAME} 
     PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
-    ${DBoW2_INCLUDE_DIR}
-    ${g2o_INCLUDE_DIR}
-    # ${3RDPARTY_INSTALL_DIR}/include/g2o
-    # ${OpenCV_INCLUDE_DIRS}
-    # ${EIGEN3_INCLUDE_DIR}
-    # ${Pangolin_INCLUDE_DIRS}
-    # ${DBoW2_INCLUDE_DIR}
-    # ${g2o_INCLUDE_DIR}
-    # ${Sophus_INCLUDE_DIRS}
-
-
-#   ${PROJECT_SOURCE_DIR}
-# include
-#   ${PROJECT_SOURCE_DIR}/include
-#   ${PROJECT_SOURCE_DIR}/include/CameraModels
-#   ${Sophus_INCLUDE_DIRS}
-#   ${PROJECT_SOURCE_DIR}/3rdparty/Sophus
-#   ${OpenCV_INCLUDE_DIRS}
-#   ${EIGEN3_INCLUDE_DIR}
-#   ${Pangolin_INCLUDE_DIRS}
-#   ${DBoW2_INCLUDE_DIR}
-#   ${g2o_INCLUDE_DIR}
-#   ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
-)
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> # use absolute path to build
+    $<INSTALL_INTERFACE:include> # use relative path to install
+  )
 
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wno-deprecated-declarations) # suppress warnings from Eigen3
@@ -184,6 +157,11 @@ target_compile_options(${PROJECT_NAME} PRIVATE
     -Wextra
     -Wno-unused-parameter
     -Wno-unused-variable
+    -Wno-sign-compare
+    -Wno-maybe-uninitialized
+    -Wno-deprecated-copy
+    -Wno-reorder
+    -Wno-unused-but-set-variable
 )
 
 print_target_information(${PROJECT_NAME})
