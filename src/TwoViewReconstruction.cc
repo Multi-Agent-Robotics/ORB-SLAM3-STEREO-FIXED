@@ -21,7 +21,8 @@
 #include "Converter.h"
 #include "GeometricTools.h"
 
-#include "3rdparty/DBoW2/DUtils/Random.h"
+// #include "3rdparty/DBoW2/DUtils/Random.h"
+#include <DBoW2/DUtils/Random.h>
 
 #include<thread>
 

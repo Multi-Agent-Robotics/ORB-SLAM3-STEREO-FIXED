@@ -101,3 +101,5 @@ log.txt
 3rdparty/install/
 
 log/
+
+.xmake/

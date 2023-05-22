@@ -10,20 +10,9 @@ project(ORB_SLAM3
   LANGUAGES CXX
 )
 
+include(cmake/disallow.cmake)
 include(cmake/printers.cmake)
 
-function(disallow_in_source_builds)
-    if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
-        message(FATAL_ERROR "In-source builds are not allowed. Please, create a separate directory for build files.")
-    endif()
-endfunction()
-
-function(disallow_system_install_prefix)
-    # disallow installing in /usr/local
-    if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-        message(FATAL_ERROR "CMAKE_INSTALL_PREFIX is set to default value: ${CMAKE_INSTALL_PREFIX}. This is not recommended.")
-    endif()
-endfunction()
 
 macro(use_ninja_if_available)
     if(NOT ${CMAKE_GENERATOR} STREQUAL Ninja)
@@ -48,19 +37,6 @@ endif()
 disallow_in_source_builds()
 disallow_system_install_prefix()
 use_ninja_if_available()
-
-option(WALL "Enable all warnings" ON)
-option(WERROR "Treat warnings as errors" OFF)
-if(WALL)
-    message(STATUS "Enabling -Wall")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-endif()
-if(WERROR)
-    message(STATUS "Enabling -Werror")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
-endif()
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -march=native")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native")
@@ -118,101 +94,99 @@ printlist(CMAKE_MODULE_PATH)
 find_package(OpenCV 4.2.0 REQUIRED)
 find_package(Eigen3 3.1.0 REQUIRED)
 
-# set(DBoW2_DIR ${3RDPARTY_INSTALL_DIR}/lib/cmake/DBoW2)
 find_package(DBoW2 REQUIRED)
-# set(G2O_DIR ${3RDPARTY_INSTALL_DIR}/lib/cmake/g2o)
 find_package(g2o REQUIRED)
-# print_what_find_package_found(DBoW2)
 find_package(Sophus REQUIRED)
 find_package(Pangolin REQUIRED)
 
-# in 3rdparty/DBoW2
-# in 3rdparty/Sophus
-# print everything the find_package() found
-# printlist(OpenCV_LIBS)
-# printlist(EIGEN3_INCLUDE_DIR)
-# printlist(EIGEN3_LIBS)
-# printlist(DBoW2_LIBS)
-# printlist(Sophus_LIBS)
-# printlist(G2O_LIBS)
+function(assert_target_exists target)
+    if(NOT TARGET ${target})
+        message(FATAL_ERROR "Target ${target} does not exist")
+    endif()
+endfunction()
 
-# in 3rdparty/g2o 
-# in 3rdparty/Pangolin
+assert_target_exists(DBoW2::DBoW2)
+assert_target_exists(g2o::g2o)
 
+print_target_information(DBoW2::DBoW2)
+print_target_information(g2o::g2o)
 
-# if we are on windows
-
-
-# include_directories(
-# ${PROJECT_SOURCE_DIR}
-# ${PROJECT_SOURCE_DIR}/include
-# ${PROJECT_SOURCE_DIR}/include/CameraModels
-# ${PROJECT_SOURCE_DIR}/3rdparty/Sophus
-# ${EIGEN3_INCLUDE_DIR}
-# ${Pangolin_INCLUDE_DIRS}
-# LES CONFIGURE_DEPENDS
-#   ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
-# )
-
-
-# # src/*.cc
-# file(SRC_FILES GLOB_RECURSE ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc)
-# file(HEADER_FILES GLOB_RECURSE ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h)
 
 file(GLOB_RECURSE SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc)
 file(GLOB_RECURSE HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h)
 
-add_library(${PROJECT_NAME} STATIC "")
+set(LIBRARY_TYPE STATIC)
+
+add_library(${PROJECT_NAME} ${LIBRARY_TYPE} "")
 target_sources(${PROJECT_NAME} PRIVATE
   ${SRC_FILES}
   ${HEADER_FILES}
 )
 
-# add_library(${PROJECT_NAME} SHARED
-#   ${SRC_FILES}
-#   ${HEADER_FILES}
-# )
+
+printlist(g2o_INCLUDE_DIR)
+printlist(g2o_LIBRARIES)
+printlist(DBoW2_INCLUDE_DIR)
+printlist(DBoW2_LIBRARIES)
+printlist(Sophus_INCLUDE_DIR)
+printlist(Sophus_LIBRARIES)
+printlist(Pangolin_INCLUDE_DIR)
+printlist(Pangolin_LIBRARIES)
+
+
+
+
+target_link_libraries(${PROJECT_NAME} PUBLIC
+    ${OpenCV_LIBS}
+    ${EIGEN3_LIBS}
+    ${Pangolin_LIBRARIES}
+    DBoW2::DBoW2
+    g2o::g2o
+    ${Sophus_LIBRARIES}
+    -lboost_serialization
+    -lcrypto
+)
 
 # TODO: remove duplicate include_directories
-target_include_directories(${PROJECT_NAME} PRIVATE
+target_include_directories(${PROJECT_NAME} 
+    PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+    ${DBoW2_INCLUDE_DIR}
+    ${g2o_INCLUDE_DIR}
+    # ${3RDPARTY_INSTALL_DIR}/include/g2o
+    # ${OpenCV_INCLUDE_DIRS}
+    # ${EIGEN3_INCLUDE_DIR}
+    # ${Pangolin_INCLUDE_DIRS}
+    # ${DBoW2_INCLUDE_DIR}
+    # ${g2o_INCLUDE_DIR}
+    # ${Sophus_INCLUDE_DIRS}
+
+
 #   ${PROJECT_SOURCE_DIR}
-include
+# include
 #   ${PROJECT_SOURCE_DIR}/include
 #   ${PROJECT_SOURCE_DIR}/include/CameraModels
-  ${Sophus_INCLUDE_DIRS}
+#   ${Sophus_INCLUDE_DIRS}
 #   ${PROJECT_SOURCE_DIR}/3rdparty/Sophus
-  ${OpenCV_INCLUDE_DIRS}
-  ${EIGEN3_INCLUDE_DIR}
-  ${Pangolin_INCLUDE_DIRS}
-  ${DBoW2_INCLUDE_DIRS}
-  ${g2o_INCLUDE_DIRS}
+#   ${OpenCV_INCLUDE_DIRS}
+#   ${EIGEN3_INCLUDE_DIR}
+#   ${Pangolin_INCLUDE_DIRS}
+#   ${DBoW2_INCLUDE_DIR}
+#   ${g2o_INCLUDE_DIR}
 #   ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h
 )
 
 
-# printlist(Pangolin_LIBRARIES)
-
-target_link_libraries(${PROJECT_NAME}
-  ${OpenCV_LIBS}
-  ${EIGEN3_LIBS}
-  ${Pangolin_LIBRARIES}
-#   ${DBoW2_LIBS}
-#   ${g2o_LIBS}
-    DBoW2::DBoW2
-  g2o::g2o
-
-  # ${PROJECT_SOURCE_DIR}/3rdparty/DBoW2/lib/libDBoW2.so
-# ${PROJECT_SOURCE_DIR}/3rdparty/g2o/lib/libg2o.so
-# ${PROJECT_SOURCE_DIR}/3rdparty/install/lib/libpango_windowing.so
-# ${PROJECT_SOURCE_DIR}/3rdparty/install/lib/libpango_image.so
--lboost_serialization
--lcrypto
+target_compile_options(${PROJECT_NAME} PRIVATE -Wno-deprecated-declarations) # suppress warnings from Eigen3
+target_compile_options(${PROJECT_NAME} PRIVATE
+    -Wall
+    -Wextra
+    -Wno-unused-parameter
+    -Wno-unused-variable
 )
 
-target_compile_options(${PROJECT_NAME} PRIVATE -Wno-deprecated-declarations) # suppress warnings from Eigen3
-
-
-# print_target_information(${PROJECT_NAME})
+print_target_information(${PROJECT_NAME})
 
 
 
@@ -221,12 +195,17 @@ target_compile_options(${PROJECT_NAME} PRIVATE -Wno-deprecated-declarations) # s
 #   DESTINATION include
 # )
 
-# set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_PROJECT_SOURCE_DIR}/lib)
-install(TARGETS ${PROJECT_NAME}
-  DESTINATION lib
-  PUBLIC_HEADER DESTINATION include
-  ARCHIVE DESTINATION lib
-)
+include(GNUInstallDirs)
+# using GnuInstallDirs after cmake 3.14 makes it so you
+# do not have to specify the full path of RUNTIME DESTINATION etc.
+install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets)
+
+
+# install(TARGETS ${PROJECT_NAME}
+#   DESTINATION lib
+#   PUBLIC_HEADER DESTINATION include
+#   ARCHIVE DESTINATION lib
+# )
 
 get_target_property(OUT ${PROJECT_NAME} INTERFACE_INCLUDE_DIRECTORIES)
 foreach(dir ${OUT})
@@ -237,3 +216,8 @@ get_target_property(OUT ${PROJECT_NAME} INCLUDE_DIRECTORIES)
 foreach(dir ${OUT})
   message(STATUS "dir='${dir}'")
 endforeach()
+
+print_all_variables_with_prefix("DBoW2")
+print_all_variables_with_prefix("g2o")
+print_all_variables_with_prefix("Sophus")
+print_all_variables_with_prefix("Pangolin")

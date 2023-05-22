@@ -28,15 +28,25 @@
 
 #include <math.h>
 
-#include "3rdparty/g2o/g2o/types/types_seven_dof_expmap.h"
-#include "3rdparty/g2o/g2o/core/sparse_block_matrix.h"
-#include "3rdparty/g2o/g2o/core/block_solver.h"
-#include "3rdparty/g2o/g2o/core/optimization_algorithm_levenberg.h"
-#include "3rdparty/g2o/g2o/core/optimization_algorithm_gauss_newton.h"
-#include "3rdparty/g2o/g2o/solvers/linear_solver_eigen.h"
-#include "3rdparty/g2o/g2o/types/types_six_dof_expmap.h"
-#include "3rdparty/g2o/g2o/core/robust_kernel_impl.h"
-#include "3rdparty/g2o/g2o/solvers/linear_solver_dense.h"
+// #include "3rdparty/g2o/g2o/types/types_seven_dof_expmap.h"
+// #include "3rdparty/g2o/g2o/core/sparse_block_matrix.h"
+// #include "3rdparty/g2o/g2o/core/block_solver.h"
+// #include "3rdparty/g2o/g2o/core/optimization_algorithm_levenberg.h"
+// #include "3rdparty/g2o/g2o/core/optimization_algorithm_gauss_newton.h"
+// #include "3rdparty/g2o/g2o/solvers/linear_solver_eigen.h"
+// #include "3rdparty/g2o/g2o/types/types_six_dof_expmap.h"
+// #include "3rdparty/g2o/g2o/core/robust_kernel_impl.h"
+// #include "3rdparty/g2o/g2o/solvers/linear_solver_dense.h"
+
+#include <g2o/types/types_seven_dof_expmap.h>
+#include <g2o/core/sparse_block_matrix.h>
+#include <g2o/core/block_solver.h>
+#include <g2o/core/optimization_algorithm_levenberg.h>
+#include <g2o/core/optimization_algorithm_gauss_newton.h>
+#include <g2o/solvers/linear_solver_eigen.h>
+#include <g2o/types/types_six_dof_expmap.h>
+#include <g2o/core/robust_kernel_impl.h>
+#include <g2o/solvers/linear_solver_dense.h>
 
 namespace ORB_SLAM3
 {

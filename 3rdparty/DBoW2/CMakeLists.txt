@@ -48,6 +48,11 @@ file(GLOB_RECURSE HDRS_DBOW2 "DBoW2/*.h")
 file(GLOB_RECURSE SRCS_DUTILS "DUtils/*.cpp")
 file(GLOB_RECURSE HDRS_DUTILS "DUtils/*.h")
 
+set(DBOW2_HEADER_FILES
+    ${HDRS_DBOW2}
+    ${HDRS_DUTILS}
+)
+
 # use the local install of OpenCV 4.2.0, to avoid conflict with the system OpenCV
 # Which on Jetpack 5.1 is OpenCV 4.5.1
 # see `./scripts/install_opencv_4.2.0.sh`
@@ -64,7 +69,7 @@ endif()
 # create the library
 add_library(${PROJECT_NAME} STATIC "")
 target_sources(${PROJECT_NAME} PRIVATE ${SRCS_DBOW2} ${SRCS_DUTILS})
-
+target_compile_options(${PROJECT_NAME} PRIVATE -Wall -O3 -march=native)
 target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
 
 # using GnuInstallDirs after cmake 3.14 makes it so you
@@ -78,11 +83,11 @@ target_include_directories(${PROJECT_NAME}
         ${OpenCV_INCLUDE_DIRS}
 )
 
+
+
 # install public header files
-install(DIRECTORY DBoW2 DUtils
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-  FILES_MATCHING PATTERN "*.h"
-)
+# install(DIRECTORY DBoW2/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} FILES_MATCHING PATTERN "*.h")
+# install(DIRECTORY DUtils/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} FILES_MATCHING PATTERN "*.h")
 
 # Export the export set for downstream projects
 install(EXPORT ${PROJECT_NAME}Targets
@@ -94,7 +99,7 @@ install(EXPORT ${PROJECT_NAME}Targets
 include(CMakePackageConfigHelpers)
 
 configure_package_config_file(
-    cmake/${PROJECT_NAME}Config.cmake.in                      # the template file
+    ${CMAKE_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in                      # the template file
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake   # destination
     PATH_VARS CMAKE_INSTALL_INCLUDEDIR
     INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
@@ -107,6 +112,7 @@ install(FILES
 
 # create and install a version file. when find_package() is called, this ensures
 # that the version found is compatible with the version required.
+#   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}ConfigVersion.cmake
 write_basic_package_version_file(
   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
   VERSION ${PROJECT_VERSION}
@@ -116,4 +122,11 @@ write_basic_package_version_file(
 install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)
+
+
+# Install header files
+install(
+  FILES ${DBOW2_HEADER_FILES}
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
 )
