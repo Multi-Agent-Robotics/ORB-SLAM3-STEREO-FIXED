@@ -3651,6 +3651,41 @@ bool Tracking::Relocalization()
             // ANSWER(15-05-2023 14:02:10, jens, currentframe): we dont know outliers before starting the ransac solver, so we cant do anything here at all
             // FOUND(17-05-2023 09:42:54, jens, matches): vvpMapPointMatches is output, all matches between keyframe and currentframe
             int nmatches = matcher.SearchByBoW(pKF,mCurrentFrame,vvpMapPointMatches[i]);
+            // COMMENT(22-05-2023 09:41:03, jens, filtering): maybe filtering should be done here.
+            // In case the filtering would bring the amount of matches below 15, we should discard the keyframe
+                
+            // ADDED(22-05-2023 09:31:20, jens, filtering): outliers being filtered from vvpMapPointMatches before ransac
+            // filtering known outliers from vvpMapPointMatches
+            // every outlier in the circular buffer is a known outlier
+            bool filtering = false;
+            for (auto mappoint : vvpMapPointMatches[i]) {
+                // for each entry of mappoint lists in the circular buffer
+                // check each mappoint if it is a known outlier
+                // if it is a known outlier, remove it from vvMapPointMatches
+
+                for (auto frame_outliers : outlier_memory) {
+                    // for each frame_outliers in the circular buffer
+                    // check if the mappoint is in the frame_outliers
+                    // if it is, remove it from vvMapPointMatches
+                    // if it is not, continue
+                    if (frame_outliers.find(mappoint) != frame_outliers.end()) {
+                        // if the mappoint is in the frame_outliers
+                        // remove it from vvMapPointMatches
+                        vvpMapPointMatches[i].erase(std::remove(vvpMapPointMatches[i].begin(), vvpMapPointMatches[i].end(), mappoint), vvpMapPointMatches[i].end());
+
+                        // set filtering to true
+                        if (!filtering) {
+                            filtering = true;
+                        }
+                    }
+                }
+            }
+            // if we have filtered outliers from vvpMapPointMatches
+            // nmatches must have decreased thus needing to be updates
+            if (filtering) {
+                nmatches = vvpMapPointMatches[i].size();
+            }
+            // ----------------------------------------------------------------------------------------------
             if(nmatches<15)
             {
                 vbDiscarded[i] = true;
@@ -3675,28 +3710,6 @@ bool Tracking::Relocalization()
                 // before giving them to the solver
                 // TODO(17-05-2023 10:03:05, jens, remember): the MLPnPsolver is the actor who needs to be responsible for
                 // remembering outliers
-                
-                // ADDED(22-05-2023 09:31:20, jens, filtering): outliers being filtered from vvpMapPointMatches before ransac
-                // filtering known outliers from vvpMapPointMatches
-                // every outlier in the circular buffer is a known outlier
-                for (auto mappoint : vvpMapPointMatches[i]) {
-                    // for each entry of mappoint lists in the circular buffer
-                    // check each mappoint if it is a known outlier
-                    // if it is a known outlier, remove it from vvMapPointMatches
-
-                    for (auto frame_outliers : outlier_memory) {
-                        // for each frame_outliers in the circular buffer
-                        // check if the mappoint is in the frame_outliers
-                        // if it is, remove it from vvMapPointMatches
-                        // if it is not, continue
-                        if (frame_outliers.find(mappoint) != frame_outliers.end()) {
-                            // if the mappoint is in the frame_outliers
-                            // remove it from vvMapPointMatches
-                            vvpMapPointMatches[i].erase(std::remove(vvpMapPointMatches[i].begin(), vvpMapPointMatches[i].end(), mappoint), vvpMapPointMatches[i].end());
-                        }
-                    }
-                }
-                // ----------------------------------------------------------------------------------------------
 
                 MLPnPsolver* pSolver = new MLPnPsolver(mCurrentFrame,vvpMapPointMatches[i]);
                 pSolver->SetRansacParameters(0.99,10,300,6,0.5,5.991);  //This solver needs at least 6 points
