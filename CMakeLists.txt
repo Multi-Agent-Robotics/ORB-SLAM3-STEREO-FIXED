@@ -69,6 +69,38 @@ install(FILES ${CMAKE_BINARY_DIR}/compile_commands.json DESTINATION ${CMAKE_CURR
 #    message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 # endif()
 
+function(check_cxx_standard_support STANDARD)
+    # Create a simple C++ program.
+    set(TEST_PROGRAM "
+    int main() {
+        return 0;
+    }
+    ")
+
+    # Try to compile the program with the given standard.
+    file(WRITE "${CMAKE_BINARY_DIR}/test.cpp" "${TEST_PROGRAM}")
+    try_compile(COMPILE_SUCCEEDED ${CMAKE_BINARY_DIR} "${CMAKE_BINARY_DIR}/test.cpp"
+        CXX_STANDARD ${STANDARD}
+        OUTPUT_VARIABLE OUTPUT
+    )
+
+    # Check if the compilation was successful.
+    if (COMPILE_SUCCEEDED)
+        message(STATUS "The CXX compiler supports C++${STANDARD}.")
+        set(CXX_STANDARD_SUPPORTED TRUE PARENT_SCOPE)
+    else()
+        message(WARNING "The CXX compiler does not support C++${STANDARD}.")
+        set(CXX_STANDARD_SUPPORTED FALSE PARENT_SCOPE)
+    endif()
+endfunction()
+
+
+# Check C++17 support
+# check_cxx_standard_support(17)
+# if (NOT CXX_STANDARD_SUPPORTED)
+#     message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++17 support. Please use a different C++ compiler.")
+# endif()
+
 set(CMAKE_CXX_STANDARD 17) # use std::optional
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF) # disable compiler extensions like gnu++17
