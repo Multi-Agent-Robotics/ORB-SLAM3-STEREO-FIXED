@@ -56,5 +56,12 @@
 			"// ADDED($CURRENT_DATE-$CURRENT_MONTH-$CURRENT_YEAR $CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND, ${1|jens,kristoffer,jonas|}, ${2:keyword}): ${3:description}"
 		],
 		"description": "Meta comment: Comment to let other people know what's been added"
+	},
+	"Let's others know what has been changed": {
+		"prefix": "changed",
+		"body": [
+			"// CHANGED($CURRENT_DATE-$CURRENT_MONTH-$CURRENT_YEAR $CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND, ${1|jens,kristoffer,jonas|}, ${2:keyword}): ${3:description}"
+		],
+		"description": "Meta comment: Comment to let other people know what's been changed"
 	}
 }

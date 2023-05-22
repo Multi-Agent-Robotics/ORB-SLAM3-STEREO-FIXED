@@ -32,6 +32,7 @@
 #include <iostream>
 
 #include <mutex>
+#include <algorithm>
 #include <chrono>
 
 
@@ -3668,7 +3669,8 @@ bool Tracking::Relocalization()
                     // check if the mappoint is in the frame_outliers
                     // if it is, remove it from vvMapPointMatches
                     // if it is not, continue
-                    if (frame_outliers.find(mappoint) != frame_outliers.end()) {
+                    if (std::find(frame_outliers.begin(), frame_outliers.end(), mappoint) != frame_outliers.end()) {
+                            
                         // if the mappoint is in the frame_outliers
                         // remove it from vvMapPointMatches
                         vvpMapPointMatches[i].erase(std::remove(vvpMapPointMatches[i].begin(), vvpMapPointMatches[i].end(), mappoint), vvpMapPointMatches[i].end());
@@ -3752,7 +3754,7 @@ bool Tracking::Relocalization()
             // ADDED(22-05-2023 09:33:30, jens, register): registering outliers and remembering them
             // the outlier_features are to be registered as outliers
             for (auto mappoint : outlier_features) {
-                mappoint->registeres_outlier = true;
+                mappoint->registered_outlier = true;
             }
 
             // ADDED(19-05-2023 14:51:00, jens, outlier): add the outliers to the memory
@@ -3764,7 +3766,7 @@ bool Tracking::Relocalization()
                 auto outlier_forget = optional_outlier_forget.value();
 
                 for (auto mappoint : outlier_forget) {
-                    mappoint->registeres_outlier = false;
+                    mappoint->registered_outlier = false;
                 }
             }
             // -----------------------------------------------------------------------------------------
