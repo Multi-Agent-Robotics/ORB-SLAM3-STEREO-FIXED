@@ -26,7 +26,7 @@ set(CHECKMARK "✔")
 set(CHECKMARK_COLOR ${GREEN})
 set(CROSS "✘")
 set(CROSS_COLOR ${RED})
-  
+
 
 # NOTE: this has to be a macro because it needs to modify a global variable
 set(__PRINTVAR_LENGTH_OF_LONGEST_VAR_NAME 0)
@@ -50,6 +50,56 @@ macro(printvar var)
         message(STATUS "${GREEN}${var}${RESET}${padding} = ${${var}}")
     endif()
 endmacro()
+
+
+# Takes a list and prints it with each element enumerated and right-aligned
+# e.g.:
+#   0. foo
+#   1. bar
+#   2. baz
+function(print_list_enumerated var)
+    # copy the list so we can sort it
+    # set(copy ${${var}})
+    # list(SORT ${copy})
+
+    list(LENGTH ${var} COUNT)
+    if(${COUNT} GREATER 9)
+        set(width 2)
+    elseif(${COUNT} GREATER 99)
+        set(width 3)
+    elseif(${COUNT} GREATER 999)
+        set(width 4)
+    else()
+        set(width 1)
+    endif()
+
+    set(i 0)
+    # alternate between bold and normal text
+    foreach(elem ${${var}})
+        string(LENGTH ${i} i_length)
+        set(padding "")
+        math(EXPR padding_length "${width} - ${i_length}")
+        foreach(j RANGE ${padding_length})
+            set(padding "${padding} ")
+        endforeach()
+        # right-align the numbers
+        math(EXPR remainder "${i} % 2")
+        set(markup ${RESET})
+        if(${remainder} EQUAL 0)
+            set(markup ${BOLD})
+        endif()
+
+        # check if elem is a generator expression .i.e. starts with $< and ends with >
+        # if so, print it in blue
+        string(REGEX MATCH "^\\$<.*>$" is_generator_expression ${elem})
+        if(is_generator_expression)
+            set(markup "${BLUE}")
+        endif()
+
+        message("${padding}${i}. ${markup}${elem}${RESET}")
+        math(EXPR i "${i} + 1")
+    endforeach()
+endfunction()
 
 function(printlist var)
   list(LENGTH ${var} COUNT)
@@ -101,26 +151,25 @@ function(print_target_properties target)
     endforeach()
 endfunction()
 
-function(print_target_linked_libraries target) 
+function(print_target_linked_libraries target)
   get_target_property(LINKED_LIBRARIES ${target} LINK_LIBRARIES)
   list(LENGTH LINKED_LIBRARIES LINKED_LIBRARIES_COUNT)
-  message(STATUS "target ${GREEN}${target}${RESET} linked against ${CYAN}${LINKED_LIBRARIES_COUNT}${RESET} libraries:")
+  message(STATUS "target ${GREEN}${target}${RESET} links against ${CYAN}${LINKED_LIBRARIES_COUNT}${RESET} libraries:")
   foreach(link_lib ${LINKED_LIBRARIES})
     # if the library is a shared object file, check if it exists
     set(color ${BOLD})
     if(${link_lib} MATCHES "\\.so")
       if(NOT EXISTS ${link_lib})
         set(color ${RED})
-        message(STATUS " - [${CROSS_COLOR}${CROSS}${RESET}] ${color}${link_lib}${RESET}")
+        message(" - [${CROSS_COLOR}${CROSS}${RESET}] ${color}${link_lib}${RESET}")
         continue()
       else()
-      message(STATUS " - [${CHECKMARK_COLOR}${CHECKMARK}${RESET}] ${color}${link_lib}${RESET}")  
+      message(" - [${CHECKMARK_COLOR}${CHECKMARK}${RESET}] ${color}${link_lib}${RESET}")
         continue()
-      endif()  
+      endif()
     endif()
-    message(STATUS " - ${color}${link_lib}${RESET}")
+    message(" - ${color}${link_lib}${RESET}")
   endforeach()
-#   message(STATUS "")
 endfunction()
 
 function(print_target_included_directories target)
@@ -161,7 +210,7 @@ function(print_target_sources target)
       set(mark_color ${CHECKMARK_COLOR})
       math(EXPR sources_exist_count "${sources_exist_count} + 1")
     endif()
-    message(STATUS " - [${mark_color}${mark}${RESET}] ${color}${source}${RESET}")
+    message(" - [${mark_color}${mark}${RESET}] ${color}${source}${RESET}")
   endforeach()
     message(STATUS "${sources_exist_count} of ${SOURCES_COUNT} sources exist")
 endfunction()
@@ -183,40 +232,31 @@ endfunction()
 
 function(print_property_of_target target property)
     get_target_property(${property} ${target} ${property})
-    list(LENGTH ${property} ${property}_count)
-    if (${${property}_count} EQUAL 1)
+    list(LENGTH ${property} property_count)
+    if (${property_count} EQUAL 1)
         if (${${property}} STREQUAL "${property}-NOTFOUND")
             message(STATUS "${property} not found for target ${GREEN}${target}${RESET}")
-            return()    
+            return()
         endif()
     endif()
-    message(STATUS "target ${GREEN}${target}${RESET} ${property} ${CYAN}${${property}}${RESET}")
-    foreach(el ${${property}})
-        message(STATUS " - ${el}")
-    endforeach()
+    message(STATUS "target ${GREEN}${target}${RESET} ${property} (${CYAN}${property_count}${RESET}):")
+    print_list_enumerated(${property})
 endfunction()
 
 function(print_target_compile_features target)
     print_property_of_target(${target} COMPILE_FEATURES)
 endfunction()
 
-# function(print_target_compile_features target)
-#     set(property COMPILE_FEATURES)
-#     list(LENGTH ${property} ${property}_COUNT)
-#     get_target_property(${property} ${target} COMPILE_FEATURES)
-#     if (${COMPILE_FEATURES} STREQUAL "COMPILE_FEATURES-NOTFOUND")
-#         message(STATUS "compile features not found for target ${GREEN}${target}${RESET}")
-#         return()
-#     endif()
-#     message(STATUS "target ${GREEN}${target}${RESET} compile features ${CYAN}${COMPILE_FEATURES_COUNT}${RESET}:")
-#     foreach(compile_feature ${COMPILE_FEATURES})
-#         message(STATUS " - ${compile_feature}")
-#     endforeach()
-# endfunction()
-
-
 function(print_target_compile_options target)
     print_property_of_target(${target} COMPILE_OPTIONS)
+endfunction()
+
+function(print_target_compile_definitions target)
+    print_property_of_target(${target} COMPILE_DEFINITIONS)
+endfunction()
+
+function(print_target_link_options target)
+    print_property_of_target(${target} LINK_OPTIONS)
 endfunction()
 
 # function(print_target_compile_options target)
@@ -289,7 +329,7 @@ function(print_target_information target)
     message(WARNING "target ${GREEN}${target}${RESET} is an unknown type")
     return()
   endif()
-  
+
 #   set(n 100)
   get_terminal_columns(NUM_TERMINAL_COLUMNS)
   # subtract 4 for the delimiters and 2 for the spaces
@@ -315,6 +355,8 @@ function(print_target_information target)
   hr(${delim} ${n})
   print_target_compile_options(${target})
   hr(${delim} ${n})
+    print_target_link_options(${target})
+    hr("=" ${n})
 endfunction()
 
 function(print_what_find_package_found pkg)
@@ -357,7 +399,7 @@ function(print_cmake_host_system_information)
             set(length_of_longest_key ${key_length})
         endif()
     endforeach()
-    
+
     foreach(key ${keys})
         cmake_host_system_information(RESULT value QUERY ${key})
         if(${value} EQUAL 1)
@@ -365,10 +407,10 @@ function(print_cmake_host_system_information)
         elseif(${value} EQUAL "0")
             set(value "${RED}no${RESET}")
         endif()
-        
+
         message(STATUS "- ${MAGENTA}${key}${RESET}: ${value}")
     endforeach()
-    
+
     # Queries system information of the host system on which cmake runs. One or more <key> can be provided to select the information to be queried. The list of queried values is stored in <variable>.
 
 # <key> can be one of the following values:
@@ -502,11 +544,21 @@ function(print_all_variables)
     endforeach()
 endfunction()
 
+macro(find_longest_string_in_list list_to_search output_variable_name)
+    set(longest_string "")
+    set(length_of_longest_string 0)
+    foreach (string ${list_to_search})
+        string(LENGTH ${string} string_length)
+        if(${string_length} GREATER ${length_of_longest_string})
+            set(length_of_longest_string ${string_length})
+            set(longest_string ${string})
+        endif()
+    endforeach()
+    set(${output_variable_name} ${longest_string} PARENT_SCOPE)
+endmacro()
+
 function(print_all_variables_with_prefix prefix)
     get_terminal_columns(NUM_TERMINAL_COLUMNS)
-    # subtract 4 for the delimiters and 2 for the spaces
-    # math(EXPR n "${NUM_TERMINAL_COLUMNS} - 4")
-    # set(n ${NUM_TERMINAL_COLUMNS})
     math(EXPR n "${NUM_TERMINAL_COLUMNS} - 1")
     hr("=" ${n})
 
@@ -517,17 +569,48 @@ function(print_all_variables_with_prefix prefix)
         string(REGEX MATCH "^${prefix}" match_result ${variable_name})
         if(match_result)
             list(APPEND variables_with_prefix ${variable_name})
-            # message(" - ${variable_name}=${${variable_name}}")
         endif()
     endforeach()
+
+    find_longest_string_in_list(${variables_with_prefix} longest_string)
+    message(STATUS "longest_string=${longest_string}")
+    string(LENGTH ${longest_string} length_of_longest_variable_name)
 
     # sort the list
     list(SORT variables_with_prefix)
     list(LENGTH variables_with_prefix num_variables_with_prefix)
+    set(number_of_empty_variables 0)
     message(STATUS "ALL VARIABLES WITH PREFIX: ${YELLOW}${prefix}${RESET} (${num_variables_with_prefix} variables)")
     foreach (variable_name ${variables_with_prefix})
-        message(" - ${GREEN}${variable_name}${RESET} = ${${variable_name}}")
+        set(padding "")
+        string(LENGTH ${variable_name} variable_name_length)
+        math(EXPR padding_length "${length_of_longest_variable_name} - ${variable_name_length}")
+        # string(REPEAT " " ${padding_length} padding)
+
+        # if the variable is empty, then print it in red
+        set(color ${GREEN})
+        if("${${variable_name}}" STREQUAL "")
+            math(EXPR number_of_empty_variables "${number_of_empty_variables} + 1")
+            set(color ${RED})
+        endif()
+
+        message(" - ${color}${variable_name}${RESET}${padding} = ${${variable_name}}")
     endforeach()
-    
+
+    if(${number_of_empty_variables} GREATER 0)
+        message("") # newline
+        message(STATUS "${RED}${number_of_empty_variables} variables are empty${RESET} out of ${num_variables_with_prefix} variables with prefix ${YELLOW}${prefix}${RESET}")
+    endif()
+
     hr("=" ${n})
+endfunction()
+
+
+# function(get_all_targets output_variable)
+#     get_all_targets_with_prefix("" ${output_variable})
+# endfunction()
+
+
+function(print_CMAKE_variables)
+    print_all_variables_with_prefix("CMAKE_")
 endfunction()
