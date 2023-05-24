@@ -3651,7 +3651,9 @@ bool Tracking::Relocalization()
             // QUESTION(15-05-2023 14:02:36, jens, currentframe): do we want to remove the features from the frame or simply make sure not to use them in the solver?
             // ANSWER(15-05-2023 14:02:10, jens, currentframe): we dont know outliers before starting the ransac solver, so we cant do anything here at all
             // FOUND(17-05-2023 09:42:54, jens, matches): vvpMapPointMatches is output, all matches between keyframe and currentframe
-            int nmatches = matcher.SearchByBoW(pKF,mCurrentFrame,vvpMapPointMatches[i]);
+
+            // COMMENT(24-05-2023 09:47:18, jens, test): check if it is a better way to match features similarly to how it is done in SearchByBoW
+            int nmatches = matcher.SearchByBoW(pKF, mCurrentFrame, vvpMapPointMatches[i]);
             // COMMENT(22-05-2023 09:41:03, jens, filtering): maybe filtering should be done here.
             // In case the filtering would bring the amount of matches below 15, we should discard the keyframe
                 
@@ -3670,7 +3672,10 @@ bool Tracking::Relocalization()
                     // if it is, remove it from vvMapPointMatches
                     // if it is not, continue
                     if (std::find(frame_outliers.begin(), frame_outliers.end(), mappoint) != frame_outliers.end()) {
-                            
+                        
+                        // TODO(24-05-2023 09:46:24, jens, test): print or count if anything is filtered
+                        // COMMENT(24-05-2023 09:48:50, jens, match): maybe match similarly to SearchByBoW instead
+
                         // if the mappoint is in the frame_outliers
                         // remove it from vvMapPointMatches
                         vvpMapPointMatches[i].erase(std::remove(vvpMapPointMatches[i].begin(), vvpMapPointMatches[i].end(), mappoint), vvpMapPointMatches[i].end());
