@@ -24,7 +24,7 @@ macro(use_ninja_if_available)
             else()
             message(NOTICE "Ninja build system not found. Using the default generator ${CMAKE_GENERATOR}.")
         endif()
-    endif()      
+    endif()
 endmacro()
 
 disallow_in_source_builds()
@@ -45,8 +45,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native")
 
 file(GLOB_RECURSE SRCS_DBOW2 "DBoW2/*.cpp")
 file(GLOB_RECURSE HDRS_DBOW2 "DBoW2/*.h")
-file(GLOB_RECURSE SRCS_DUTILS "DUtils/*.cpp")
-file(GLOB_RECURSE HDRS_DUTILS "DUtils/*.h")
+file(GLOB_RECURSE SRCS_DUTILS "DBoW2/DUtils/*.cpp")
+file(GLOB_RECURSE HDRS_DUTILS "DBoW2/DUtils/*.h")
 
 set(DBOW2_HEADER_FILES
     ${HDRS_DBOW2}

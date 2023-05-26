@@ -5,6 +5,8 @@ set -o pipefail
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
+"${SCRIPT_DIR}"/install_pangolin.sh
+
 source "$SCRIPT_DIR/utils.sh" || exit 1
 
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
@@ -85,10 +87,9 @@ popd
 hr -
 
 green "Configuring and building ORB_SLAM3 ...\n"
-cmake -S . -B ./build -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake -S . -B ./build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX"
 cmake --build ./build
-test -d ~/.local || mkdir -p ~/.local
-CMAKE_INSTALL_PREFIX=~/.local cmake --build ./build --target install
+
 green "Configuring and building ORB_SLAM3 DONE\n"
 
 green "All done :D\n"
