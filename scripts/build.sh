@@ -2,27 +2,11 @@
 
 set -e
 set -o pipefail
- 
-function pushd() { command pushd "$@" > /dev/null; }
-function popd() { command popd > /dev/null; }
-
-GREEN='\033[0;32m'
-RED='\033[0;31m'
-NC='\033[0m' # No Color
-
-green() { echo -en "${GREEN}$1${NC}" ; }
-red () { echo -en "${RED}$1${NC}" ; }
-
-function hr() {
-    local char=${1:-=}
-    local cols=${2:-$COLUMNS}
-    if [ -z "$cols" ]; then
-        cols=$(tput cols)
-    fi
-    printf "%${cols}s" | tr ' ' "$char"
-}
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+source "$SCRIPT_DIR/utils.sh" || exit 1
+
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 THIRD_PARTY_DIR="$PROJECT_DIR/3rdparty"
 
@@ -73,48 +57,20 @@ function build_3rdparty_library() {
 
 	green "Configuring and building ${THIRD_PARTY_DIR}/$1 ...\n"
 	pushd "$THIRD_PARTY_DIR/$1" || exit 1
-	cmake -S . -B ./build -G Ninja -DCMAKE_BUILD_TYPE=Release
-	cmake --build ./build
+
+    CMAKE_INSTALL_PREFIX="$THIRD_PARTY_DIR/install"
+    cmake -S . -B ./build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX"
+    cmake --build ./build --target install
+
 	green "Configuring and building ${THIRD_PARTY_DIR}/$1 DONE\n"
-	if [ -n "$2" ]; then 
-		green "Installing ${THIRD_PARTY_DIR}/$1 ...\n"
-		cmake --build ./build --target install
-		green "Installing ${THIRD_PARTY_DIR}/$1 DONE\n"
-	fi
+
 	popd
 	hr -
 }
 
 build_3rdparty_library "DBoW2"
 build_3rdparty_library "g2o"
-# build_3rdparty_library "Sophus" # "install"
-pushd "$THIRD_PARTY_DIR/Sophus" || exit 1
-CMAKE_INSTALL_PREFIX="$THIRD_PARTY_DIR/install"
-if ! [ -d "$CMAKE_INSTALL_PREFIX" ]; then
-    mkdir -p "$CMAKE_INSTALL_PREFIX"
-    green "Creating install directory: $CMAKE_INSTALL_PREFIX\n"
-fi
-
-echo "CMAKE_INSTALL_PREFIX: $CMAKE_INSTALL_PREFIX"
-cmake -S . -B ./build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX"
-cmake --build ./build
-cmake --build ./build --target install
-
-popd
-
-# pushd 3rdparty/g2o || exit 1
-# cmake -S . -B ./build -G Ninja -DCMAKE_BUILD_TYPE=Release
-# cmake --build ./build
-# popd
-
-# echo "Configuring and building 3rdparty/Sophus ..."
-
-# pushd 3rdparty/Sophus || exit 1
-# cmake -S . -B ./build -G Ninja -DCMAKE_BUILD_TYPE=Release
-# cmake --build ./build
-# cmake --build ./build --target install # why you do this ORB_SLAM3, why you include this one with abspath and not the others. WHY??
-# popd
-
+build_3rdparty_library "Sophus"
 
 pushd vocabulary || exit 1
 if [ ! -f ORBvoc.txt ]; then

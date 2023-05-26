@@ -252,7 +252,7 @@ include(GNUInstallDirs)
 install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets)
 
 
-print_CMAKE_variables()
+# print_CMAKE_variables()
 
 # print_all_variables_with_prefix("DBoW2")
 # print_all_variables_with_prefix("g2o")
