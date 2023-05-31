@@ -6,7 +6,7 @@ set(PATCH_VERSION 0)
 
 project(orbslam3
   VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}
-  DESCRIPTION "ORB_SLAM3"
+  DESCRIPTION "orbslam3"
   HOMEPAGE_URL "https://github.com/Multi-Agent-Robotics/ORB-SLAM3-STEREO-FIXED"
   LANGUAGES CXX
 )
@@ -14,16 +14,12 @@ project(orbslam3
 include(cmake/disallow.cmake)
 include(cmake/printers.cmake)
 
-
-macro(use_ninja_if_available)
+macro(suggest_ninja_if_available)
     if(NOT ${CMAKE_GENERATOR} STREQUAL Ninja)
         message(NOTICE "The default generator is not ninja. Consider using it for faster builds.")
         find_program(NINJA_EXECUTABLE ninja)
         if(NINJA_EXECUTABLE)
-            message(NOTICE "Found ninja build system. Using it as the default generator.")
-            set(CMAKE_GENERATOR Ninja CACHE INTERNAL "" FORCE)
-        else()
-            message(NOTICE "Ninja build system not found. Using the default generator ${CMAKE_GENERATOR}.")
+            message(NOTICE "ninja build system found. To use it, run cmake with `-G Ninja`.")
         endif()
     endif()
 endmacro()
@@ -37,12 +33,7 @@ endif()
 
 disallow_in_source_builds()
 disallow_system_install_prefix()
-use_ninja_if_available()
-
-# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -march=native")
-# set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -march=native")
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native")
-# set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
+suggest_ninja_if_available()
 
 # create compile_commands.json
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -53,73 +44,22 @@ if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.vscode)
 endif()
 install(FILES ${CMAKE_BINARY_DIR}/compile_commands.json DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/.vscode)
 
-# # Check C++14 or C++0x support
-# include(CheckCXXCompilerFlag)
-# CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
-# CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-# if(COMPILER_SUPPORTS_CXX14)
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-#    add_definitions(-DCOMPILEDWITHC14)
-#    message(STATUS "Using flag -std=c++14.")
-# elseif(COMPILER_SUPPORTS_CXX0X)
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-#    add_definitions(-DCOMPILEDWITHC0X)
-#    message(STATUS "Using flag -std=c++0x.")
-# else()
-#    message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
-# endif()
-
-function(check_cxx_standard_support STANDARD)
-    # Create a simple C++ program.
-    set(TEST_PROGRAM "
-    int main() {
-        return 0;
-    }
-    ")
-
-    # Try to compile the program with the given standard.
-    file(WRITE "${CMAKE_BINARY_DIR}/test.cpp" "${TEST_PROGRAM}")
-    try_compile(COMPILE_SUCCEEDED ${CMAKE_BINARY_DIR} "${CMAKE_BINARY_DIR}/test.cpp"
-        CXX_STANDARD ${STANDARD}
-        OUTPUT_VARIABLE OUTPUT
-    )
-
-    # Check if the compilation was successful.
-    if (COMPILE_SUCCEEDED)
-        message(STATUS "The CXX compiler supports C++${STANDARD}.")
-        set(CXX_STANDARD_SUPPORTED TRUE PARENT_SCOPE)
-    else()
-        message(WARNING "The CXX compiler does not support C++${STANDARD}.")
-        set(CXX_STANDARD_SUPPORTED FALSE PARENT_SCOPE)
-    endif()
-endfunction()
-
-
-# Check C++17 support
-# check_cxx_standard_support(17)
-# if (NOT CXX_STANDARD_SUPPORTED)
-#     message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++17 support. Please use a different C++ compiler.")
-# endif()
-
 set(CMAKE_CXX_STANDARD 17) # use std::optional
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF) # disable compiler extensions like gnu++17
+set(CMAKE_CXX_EXTENSIONS OFF) # disable compiler extensions like gnu++17, so clang can be used
 
 set(3RDPARTY_INSTALL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/install")
 printvar(3RDPARTY_INSTALL_DIR)
 
-
-IF(NOT DEFINED CMAKE_BUILD_TYPE)
-  SET(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
-ENDIF()
+if(NOT DEFINED CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
+endif()
 
 printvar(CMAKE_BUILD_TYPE)
 printvar(CMAKE_CXX_COMPILER)
 printvar(CMAKE_CXX_FLAGS)
 printvar(CMAKE_CXX_FLAGS_RELEASE)
 printvar(CMAKE_CXX_FLAGS_DEBUG)
-
-
 
 # use the local install of OpenCV 4.2.0, to avoid conflict with the system OpenCV
 # Which on Jetpack 5.1 is OpenCV 4.5.1
@@ -137,33 +77,26 @@ find_package(OpenCV 4.2.0 REQUIRED)
 find_package(Eigen3 3.1.0 REQUIRED)
 
 # found in ./3rdparty/install/lib/cmake
-find_package(DBoW2 REQUIRED)
-find_package(g2o REQUIRED)
-find_package(Sophus REQUIRED)
-find_package(Pangolin REQUIRED)
+# find_package(DBoW2 REQUIRED)
+# find_package(g2o REQUIRED)
+# find_package(Sophus REQUIRED)
+
+add_subdirectory(3rdparty/DBoW2)
+add_subdirectory(3rdparty/g2o)
+add_subdirectory(3rdparty/Sophus)
+add_subdirectory(submodules/Pangolin)
+# find_package(Pangolin REQUIRED)
+
+# print_target_sources(DBoW2)
+print_target_included_directories(DBoW2)
 
 # find the boost serialization library
 find_package(Boost REQUIRED COMPONENTS serialization)
-
-
-function(assert_target_exists target)
-    if(NOT TARGET ${target})
-        message(FATAL_ERROR "Target ${target} does not exist")
-    endif()
-endfunction()
-
-assert_target_exists(DBoW2::DBoW2)
-assert_target_exists(g2o::g2o)
-
-# print_target_information(DBoW2::DBoW2)
-# print_target_information(g2o::g2o)
-
 
 file(GLOB_RECURSE SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc)
 file(GLOB_RECURSE HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h)
 
 set(LIBRARY_TYPE STATIC)
-
 add_library(${PROJECT_NAME} ${LIBRARY_TYPE} "")
 target_sources(${PROJECT_NAME} PRIVATE
   ${SRC_FILES}
@@ -174,8 +107,8 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     ${OpenCV_LIBS}
     ${EIGEN3_LIBS}
     ${Pangolin_LIBRARIES}
-    DBoW2::DBoW2
-    g2o::g2o
+    DBoW2
+    g2o
     ${Sophus_LIBRARIES}
     # -lboost_serialization
     Boost::serialization
@@ -205,7 +138,7 @@ target_compile_options(${PROJECT_NAME} PRIVATE
     $<$<CONFIG:Release>:-O3> # highest optimization level
     $<$<CONFIG:Release>:-march=native> # enable all CPU features available on the build machine
     $<$<CONFIG:Release>:-flto> # link time optimization
-    $<$<CONFIG:Release>:-ffast-math>
+    # $<$<CONFIG:Release>:-ffast-math>
 
     $<$<CONFIG:Debug>:-g>
     $<$<CONFIG:Debug>:-O0>
@@ -244,22 +177,14 @@ else()
 endif()
 
 
-print_target_information(${PROJECT_NAME})
+# print_target_information(${PROJECT_NAME})
 
+# make the library importable from downstream projects with find_package()
+include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
 # using GnuInstallDirs after cmake 3.14 makes it so you
 # do not have to specify the full path of RUNTIME DESTINATION etc.
 install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets)
-
-
-# print_CMAKE_variables()
-
-# print_all_variables_with_prefix("DBoW2")
-# print_all_variables_with_prefix("g2o")
-# print_all_variables_with_prefix("Sophus")
-# print_all_variables_with_prefix("Pangolin")
-
-
 
 # Export the export set for downstream projects
 install(EXPORT ${PROJECT_NAME}Targets
@@ -267,12 +192,9 @@ install(EXPORT ${PROJECT_NAME}Targets
   NAMESPACE ${PROJECT_NAME}::
 )
 
-# make the library importable from downstream projects with find_package()
-include(CMakePackageConfigHelpers)
-
 configure_package_config_file(
-    ${CMAKE_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in                      # the template file
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake   # destination
+    ${CMAKE_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in # the template file
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake  # destination
     PATH_VARS CMAKE_INSTALL_INCLUDEDIR
     INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )

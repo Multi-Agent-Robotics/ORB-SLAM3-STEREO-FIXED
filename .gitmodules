@@ -1,0 +1,3 @@
+[submodule "submodules/Pangolin"]
+	path = submodules/Pangolin
+	url = https://github.com/Multi-Agent-Robotics/Pangolin.git

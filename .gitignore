@@ -64,7 +64,7 @@ f_*.txt
 3rdparty/g2o/build/
 3rdparty/g2o/config.h
 3rdparty/g2o/lib/
-3rdparty/Pangolin/
+# 3rdparty/Pangolin/
 3rdparty/opencv*
 
 vocabulary/ORBvoc.txt
@@ -107,3 +107,6 @@ log/
 .xmake/
 
 **/*.run
+
+CMakeFiles/
+CMakeCache.txt

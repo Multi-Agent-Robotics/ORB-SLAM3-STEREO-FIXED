@@ -24,11 +24,11 @@
 
 #include <math.h>
 
-#include <g2o/core/base_binary_edge.h>
-#include <g2o/core/base_multi_edge.h>
-#include <g2o/core/base_unary_edge.h>
-#include <g2o/core/base_vertex.h>
-#include <g2o/types/types_sba.h>
+#include "g2o/core/base_binary_edge.h"
+#include "g2o/core/base_multi_edge.h"
+#include "g2o/core/base_unary_edge.h"
+#include "g2o/core/base_vertex.h"
+#include "g2o/types/types_sba.h"
 
 #include <opencv2/core/core.hpp>
 

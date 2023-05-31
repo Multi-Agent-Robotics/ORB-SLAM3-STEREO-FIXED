@@ -25,8 +25,8 @@
 #include <mutex>
 #include <vector>
 
-#include <DBoW2/BowVector.h>
-#include <DBoW2/FeatureVector.h>
+#include "DBoW2/BowVector.h"
+#include "DBoW2/FeatureVector.h"
 
 #include <opencv2/opencv.hpp>
 
