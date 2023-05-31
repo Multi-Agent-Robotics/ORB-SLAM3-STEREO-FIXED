@@ -35,6 +35,15 @@ disallow_in_source_builds()
 disallow_system_install_prefix()
 suggest_ninja_if_available()
 
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+	set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+	set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+	# CMake 3.9+
+	set(CMAKE_CUDA_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+	message(STATUS "Using ccache for compilation.")
+endif()
+
 # create compile_commands.json
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # install compile_commands.json to .vscode/c_cpp_properties.json
@@ -84,11 +93,11 @@ find_package(Eigen3 3.1.0 REQUIRED)
 add_subdirectory(3rdparty/DBoW2)
 add_subdirectory(3rdparty/g2o)
 add_subdirectory(3rdparty/Sophus)
-add_subdirectory(submodules/Pangolin)
-# find_package(Pangolin REQUIRED)
 
-# print_target_sources(DBoW2)
-print_target_included_directories(DBoW2)
+# Due to how Pangolin define targets, it is easier to use find_package() instead of add_subdirectory()
+list(PREPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/submodules/install/lib/cmake)
+find_package(Pangolin REQUIRED)
+
 
 # find the boost serialization library
 find_package(Boost REQUIRED COMPONENTS serialization)
@@ -110,11 +119,14 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     DBoW2
     g2o
     sophus
+    ${Pangolin_LIBRARIES}
     # ${Sophus_LIBRARIES}
     # -lboost_serialization
     Boost::serialization
     -lcrypto
 )
+
+print_all_variables_with_prefix("Pangolin")
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC

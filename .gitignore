@@ -110,3 +110,5 @@ log/
 
 CMakeFiles/
 CMakeCache.txt
+
+submodules/install

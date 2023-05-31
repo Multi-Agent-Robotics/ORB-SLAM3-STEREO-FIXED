@@ -21,8 +21,7 @@
 #include "orbslam3/Converter.h"
 #include "orbslam3/GeometricTools.h"
 
-// #include "3rdparty/DBoW2/DUtils/Random.h"
-#include <DBoW2/DUtils/Random.h>
+#include "DUtils/Random.h"
 
 #include <thread>
 

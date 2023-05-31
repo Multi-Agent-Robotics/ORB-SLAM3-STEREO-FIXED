@@ -24,8 +24,8 @@
 // #include "3rdparty/DBoW2/DBoW2/BowVector.h"
 // #include "3rdparty/DBoW2/DBoW2/FeatureVector.h"
 
-#include <DBoW2/BowVector.h>
-#include <DBoW2/FeatureVector.h>
+#include "DBoW2/BowVector.h"
+#include "DBoW2/FeatureVector.h"
 
 #include "orbslam3/ORBVocabulary.h"
 #include "orbslam3/ORBextractor.h"
@@ -482,7 +482,7 @@ protected:
     // Bad flags
     bool mbNotErase;
     bool mbToBeErased;
-    bool mbBad;    
+    bool mbBad;
 
     float mHalfBaseline; // Only for visualization
 

@@ -22,7 +22,7 @@
 #include "orbslam3/KeyFrame.h"
 // #include "3rdparty/DBoW2/DBoW2/BowVector.h"
 
-#include <DBoW2/BowVector.h>
+#include "DBoW2/BowVector.h"
 
 #include <mutex>
 
