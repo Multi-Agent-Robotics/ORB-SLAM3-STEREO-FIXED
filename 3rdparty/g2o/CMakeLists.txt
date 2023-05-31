@@ -34,7 +34,7 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(CMAKE_LEGACY_CYGWIN_WIN32 0)
+# set(CMAKE_LEGACY_CYGWIN_WIN32 0)
 set(g2o_C_FLAGS)
 set(g2o_CXX_FLAGS)
 
@@ -102,6 +102,24 @@ configure_file(g2o/config.h.in ${g2o_SOURCE_DIR}/g2o/config.h)
 
 # create the library
 add_library(${PROJECT_NAME} STATIC "")
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)
+target_include_directories(${PROJECT_NAME} PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/g2o>
+    # $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/g2o>
+    # $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/g2o/core>
+    # $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/g2o/solvers>
+    # $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/g2o/stuff>
+    # $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/g2o/types>
+
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/g2o>
+    ${EIGEN3_INCLUDE_DIR}
+)
+target_compile_options(${PROJECT_NAME} PRIVATE
+-Wall
+    $<$<CONFIG:Release>:-O3 -march=native>
+    $<$<CONFIG:Debug>:-O0 -g>
+)
 
 file(GLOB_RECURSE G2O_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
 
@@ -213,19 +231,21 @@ find_package(Eigen3 3.1.0 REQUIRED)
 # do not have to specify the full path of RUNTIME DESTINATION etc.
 install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets)
 
-target_include_directories(${PROJECT_NAME}
-    PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/g2o>
+# target_include_directories(${PROJECT_NAME}
+# PUBLIC
+# $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/g2o>
+# $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/g2o/core>
+# $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/g2o/stuff>
+# $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/g2o/solvers>
+# $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/g2o/types>
 
-    # $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/g2o>
-    $<INSTALL_INTERFACE:include/g2o>
-    $<INSTALL_INTERFACE:include/g2o/core>
-    $<INSTALL_INTERFACE:include/g2o/stuff>
-    $<INSTALL_INTERFACE:include/g2o/solvers>
-    $<INSTALL_INTERFACE:include/g2o/types>
-    ${EIGEN3_INCLUDE_DIR}
-)
-
+# $<INSTALL_INTERFACE:include/g2o>
+# $<INSTALL_INTERFACE:include/g2o/core>
+# $<INSTALL_INTERFACE:include/g2o/stuff>
+# $<INSTALL_INTERFACE:include/g2o/solvers>
+# $<INSTALL_INTERFACE:include/g2o/types>
+# ${EIGEN3_INCLUDE_DIR}
+# )
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
     ${EIGEN3_LIBS}
