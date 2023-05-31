@@ -112,3 +112,5 @@ CMakeFiles/
 CMakeCache.txt
 
 submodules/install
+
+!Makefile

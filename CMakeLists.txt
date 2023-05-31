@@ -5,10 +5,10 @@ set(MINOR_VERSION 1)
 set(PATCH_VERSION 0)
 
 project(orbslam3
-  VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}
-  DESCRIPTION "orbslam3"
-  HOMEPAGE_URL "https://github.com/Multi-Agent-Robotics/ORB-SLAM3-STEREO-FIXED"
-  LANGUAGES CXX
+    VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}
+    DESCRIPTION "orbslam3"
+    HOMEPAGE_URL "https://github.com/Multi-Agent-Robotics/ORB-SLAM3-STEREO-FIXED"
+    LANGUAGES CXX
 )
 
 include(cmake/disallow.cmake)
@@ -18,6 +18,7 @@ macro(suggest_ninja_if_available)
     if(NOT ${CMAKE_GENERATOR} STREQUAL Ninja)
         message(NOTICE "The default generator is not ninja. Consider using it for faster builds.")
         find_program(NINJA_EXECUTABLE ninja)
+
         if(NINJA_EXECUTABLE)
             message(NOTICE "ninja build system found. To use it, run cmake with `-G Ninja`.")
         endif()
@@ -26,9 +27,9 @@ endmacro()
 
 # if os is macOS or Windows, panic!
 if(APPLE)
-  message(FATAL_ERROR "macOS is not supported")
+    message(FATAL_ERROR "macOS is not supported")
 elseif(WIN32)
-  message(FATAL_ERROR "Windows is not supported")
+    message(FATAL_ERROR "Windows is not supported")
 endif()
 
 disallow_in_source_builds()
@@ -36,21 +37,25 @@ disallow_system_install_prefix()
 suggest_ninja_if_available()
 
 find_program(CCACHE_PROGRAM ccache)
+
 if(CCACHE_PROGRAM)
-	set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
-	set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
-	# CMake 3.9+
-	set(CMAKE_CUDA_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
-	message(STATUS "Using ccache for compilation.")
+    set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+    set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+
+    # CMake 3.9+
+    set(CMAKE_CUDA_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+    message(STATUS "Using ccache for compilation.")
 endif()
 
 # create compile_commands.json
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # install compile_commands.json to .vscode/c_cpp_properties.json
 # check if folder exists
 if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.vscode)
-  file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/.vscode)
+    file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/.vscode)
 endif()
+
 install(FILES ${CMAKE_BINARY_DIR}/compile_commands.json DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/.vscode)
 
 set(CMAKE_CXX_STANDARD 17) # use std::optional
@@ -61,7 +66,7 @@ set(3RDPARTY_INSTALL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/install")
 printvar(3RDPARTY_INSTALL_DIR)
 
 if(NOT DEFINED CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
 endif()
 
 printvar(CMAKE_BUILD_TYPE)
@@ -75,8 +80,8 @@ printvar(CMAKE_CXX_FLAGS_DEBUG)
 # see `./scripts/install_opencv_4.2.0.sh`
 # https://forums.developer.nvidia.com/t/how-to-find-if-cmakelists-txt-is-residing-on-jetson-xavier/181725/4
 if(EXISTS "/etc/nv_tegra_release")
-	  message(STATUS "Host is NVIDIA Jetson")
-	  set(OpenCV_DIR "/usr/local/lib/cmake/opencv4")
+    message(STATUS "Host is NVIDIA Jetson")
+    set(OpenCV_DIR "/usr/local/lib/cmake/opencv4")
 endif()
 
 list(PREPEND CMAKE_MODULE_PATH ${3RDPARTY_INSTALL_DIR}/lib/cmake)
@@ -89,7 +94,6 @@ find_package(Eigen3 3.1.0 REQUIRED)
 # find_package(DBoW2 REQUIRED)
 # find_package(g2o REQUIRED)
 # find_package(Sophus REQUIRED)
-
 add_subdirectory(3rdparty/DBoW2)
 add_subdirectory(3rdparty/g2o)
 add_subdirectory(3rdparty/Sophus)
@@ -97,7 +101,6 @@ add_subdirectory(3rdparty/Sophus)
 # Due to how Pangolin define targets, it is easier to use find_package() instead of add_subdirectory()
 list(PREPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/submodules/install/lib/cmake)
 find_package(Pangolin REQUIRED)
-
 
 # find the boost serialization library
 find_package(Boost REQUIRED COMPONENTS serialization)
@@ -108,8 +111,8 @@ file(GLOB_RECURSE HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h)
 set(LIBRARY_TYPE STATIC)
 add_library(${PROJECT_NAME} ${LIBRARY_TYPE} "")
 target_sources(${PROJECT_NAME} PRIVATE
-  ${SRC_FILES}
-  ${HEADER_FILES}
+    ${SRC_FILES}
+    ${HEADER_FILES}
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
@@ -120,20 +123,15 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     g2o
     sophus
     ${Pangolin_LIBRARIES}
-    # ${Sophus_LIBRARIES}
-    # -lboost_serialization
     Boost::serialization
     -lcrypto
 )
-
-print_all_variables_with_prefix("Pangolin")
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> # use absolute path to build
     $<INSTALL_INTERFACE:include> # use relative path to install
-  )
-
+)
 
 target_compile_options(${PROJECT_NAME} PRIVATE
     -Wall
@@ -151,8 +149,8 @@ target_compile_options(${PROJECT_NAME} PRIVATE
     $<$<CONFIG:Release>:-O3> # highest optimization level
     $<$<CONFIG:Release>:-march=native> # enable all CPU features available on the build machine
     $<$<CONFIG:Release>:-flto> # link time optimization
-    # $<$<CONFIG:Release>:-ffast-math>
 
+    # $<$<CONFIG:Release>:-ffast-math>
     $<$<CONFIG:Debug>:-g>
     $<$<CONFIG:Debug>:-O0>
     $<$<CONFIG:Debug>:-fno-omit-frame-pointer>
@@ -180,7 +178,8 @@ target_compile_features(${PROJECT_NAME} PRIVATE
 )
 
 find_program(CPPCHECK_EXECUTABLE NAMES cppcheck)
-if (CPPCHECK_EXECUTABLE)
+
+if(CPPCHECK_EXECUTABLE)
     add_custom_target(cppcheck
         COMMAND ${CPPCHECK_EXECUTABLE} --enable=warning,performance,portability,style --std=c++17 -I${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/src
         COMMENT "Running CppCheck"
@@ -189,25 +188,25 @@ else()
     message(WARNING "CppCheck not found! You won't be able to run cppcheck.")
 endif()
 
-
 # print_target_information(${PROJECT_NAME})
 
 # make the library importable from downstream projects with find_package()
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
+
 # using GnuInstallDirs after cmake 3.14 makes it so you
 # do not have to specify the full path of RUNTIME DESTINATION etc.
 install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets)
 
 # Export the export set for downstream projects
 install(EXPORT ${PROJECT_NAME}Targets
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}Targets
-  NAMESPACE ${PROJECT_NAME}::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}Targets
+    NAMESPACE ${PROJECT_NAME}::
 )
 
 configure_package_config_file(
     ${CMAKE_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in # the template file
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake  # destination
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake # destination
     PATH_VARS CMAKE_INSTALL_INCLUDEDIR
     INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
@@ -219,11 +218,11 @@ install(FILES
 
 # create and install a version file. when find_package() is called, this ensures
 # that the version found is compatible with the version required.
-#   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}ConfigVersion.cmake
+# ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}ConfigVersion.cmake
 write_basic_package_version_file(
-  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-  VERSION ${PROJECT_VERSION}
-  COMPATIBILITY SameMajorVersion
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion
 )
 
 install(FILES
@@ -233,6 +232,6 @@ install(FILES
 
 # Install header files
 install(
-  DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
 )
