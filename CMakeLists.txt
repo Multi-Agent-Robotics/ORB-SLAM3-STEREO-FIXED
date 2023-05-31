@@ -109,7 +109,8 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     ${Pangolin_LIBRARIES}
     DBoW2
     g2o
-    ${Sophus_LIBRARIES}
+    sophus
+    # ${Sophus_LIBRARIES}
     # -lboost_serialization
     Boost::serialization
     -lcrypto
