@@ -86,11 +86,17 @@ popd
 
 hr -
 
-green "Configuring and building ORB_SLAM3 ...\n"
+green "Configuring ORB_SLAM3 ...\n"
 cmake -S . -B ./build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX"
-cmake --build ./build
+green "Configuring ORB_SLAM3 DONE\n"
 
-green "Configuring and building ORB_SLAM3 DONE\n"
+green "Building ORB_SLAM3 ...\n"
+cmake --build ./build
+green "Building ORB_SLAM3 DONE\n"
+
+green "Installing ORB_SLAM3 ...\n"
+cmake --build build --target install
+green "Installing ORB_SLAM3 DONE\n"
 
 green "All done :D\n"
 

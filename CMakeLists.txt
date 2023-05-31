@@ -4,7 +4,7 @@ set(MAJOR_VERSION 0)
 set(MINOR_VERSION 1)
 set(PATCH_VERSION 0)
 
-project(ORB_SLAM3
+project(orbslam3
   VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}
   DESCRIPTION "ORB_SLAM3"
   HOMEPAGE_URL "https://github.com/Multi-Agent-Robotics/ORB-SLAM3-STEREO-FIXED"
@@ -258,3 +258,46 @@ install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets)
 # print_all_variables_with_prefix("g2o")
 # print_all_variables_with_prefix("Sophus")
 # print_all_variables_with_prefix("Pangolin")
+
+
+
+# Export the export set for downstream projects
+install(EXPORT ${PROJECT_NAME}Targets
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}Targets
+  NAMESPACE ${PROJECT_NAME}::
+)
+
+# make the library importable from downstream projects with find_package()
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(
+    ${CMAKE_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in                      # the template file
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake   # destination
+    PATH_VARS CMAKE_INSTALL_INCLUDEDIR
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)
+
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)
+
+# create and install a version file. when find_package() is called, this ensures
+# that the version found is compatible with the version required.
+#   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}ConfigVersion.cmake
+write_basic_package_version_file(
+  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+  VERSION ${PROJECT_VERSION}
+  COMPATIBILITY SameMajorVersion
+)
+
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)
+
+# Install header files
+install(
+  DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+)

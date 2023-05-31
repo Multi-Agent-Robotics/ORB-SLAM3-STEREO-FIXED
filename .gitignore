@@ -58,6 +58,7 @@ KeyFrameTrajectory.txt
 CameraTrajectory.txt
 kf_*.txt
 f_*.txt
+
 3rdparty/DBoW2/build/
 3rdparty/DBoW2/lib/
 3rdparty/g2o/build/
@@ -65,6 +66,7 @@ f_*.txt
 3rdparty/g2o/lib/
 3rdparty/Pangolin/
 3rdparty/opencv*
+
 vocabulary/ORBvoc.txt
 build/
 
@@ -103,3 +105,5 @@ log.txt
 log/
 
 .xmake/
+
+**/*.run

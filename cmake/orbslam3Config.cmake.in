@@ -1,0 +1,8 @@
+@PACKAGE_INIT@
+
+#include(${CMAKE_CURRENT_LIST_DIR}/orbslam3.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/../orbslam3Targets/orbslam3Targets.cmake)
+set_and_check(orbslam3_INCLUDE_DIR "@PACKAGE_CMAKE_INSTALL_INCLUDEDIR@")
+set(orbslam3_LIBRARIES orbslam3::orbslam3)
+#set(orbslam3_)
+check_required_components(orbslam3)
