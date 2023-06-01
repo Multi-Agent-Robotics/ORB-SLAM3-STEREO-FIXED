@@ -1,0 +1,7 @@
+# Import the targets
+# include("@orbslam3_BINARY_DIR@/orbslam3-targets.cmake")
+include("@PROJECT_BINARY_DIR@/orbslam3-targets.cmake")
+
+# Report other information
+set(@PROJECT_NAME@_INCLUDE_DIRS "@PROJECT_SOURCE_DIR@/include")
+# set(orbslam3_INCLUDE_DIRS "@orbslam3_SOURCE_DIR@/include")

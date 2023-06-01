@@ -1,0 +1,15 @@
+function(suggest_ninja_if_available)
+    string(ASCII 27 ESC)
+    set(RESET "${ESC}[0m")
+    SET(YELLOW "${ESC}[0;33m")
+    set(BLUE "${ESC}[0;34m")
+
+    if(NOT ${CMAKE_GENERATOR} STREQUAL Ninja)
+        message(NOTICE "${YELLOW}default generator is not ninja. Consider using it for faster builds.${RESET}")
+        find_program(NINJA_EXECUTABLE ninja)
+
+        if(NINJA_EXECUTABLE)
+            message(NOTICE "${BLUE}ninja build system found. To use it, run cmake with `-G Ninja`.${RESET}")
+        endif()
+    endif()
+endfunction()

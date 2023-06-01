@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16.3)# 3.16.3 is the version on Ubuntu 20.04
+cmake_minimum_required(VERSION 3.16.3) # 3.16.3 is the version on Ubuntu 20.04
 
 set(MAJOR_VERSION 0)
 set(MINOR_VERSION 1)
@@ -13,17 +13,8 @@ project(orbslam3
 
 include(cmake/disallow.cmake)
 include(cmake/printers.cmake)
-
-macro(suggest_ninja_if_available)
-    if(NOT ${CMAKE_GENERATOR} STREQUAL Ninja)
-        message(NOTICE "The default generator is not ninja. Consider using it for faster builds.")
-        find_program(NINJA_EXECUTABLE ninja)
-
-        if(NINJA_EXECUTABLE)
-            message(NOTICE "ninja build system found. To use it, run cmake with `-G Ninja`.")
-        endif()
-    endif()
-endmacro()
+include(cmake/ccache.cmake)
+include(cmake/ninja.cmake)
 
 # if os is macOS or Windows, panic!
 if(APPLE)
@@ -33,19 +24,10 @@ elseif(WIN32)
 endif()
 
 disallow_in_source_builds()
+
 # disallow_system_install_prefix()
 suggest_ninja_if_available()
-
-find_program(CCACHE_PROGRAM ccache)
-
-if(CCACHE_PROGRAM)
-    set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
-    set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
-
-    # CMake 3.9+
-    set(CMAKE_CUDA_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
-    message(STATUS "Using ccache for compilation.")
-endif()
+use_ccache_if_available()
 
 # create compile_commands.json
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -58,9 +40,9 @@ endif()
 
 install(FILES ${CMAKE_BINARY_DIR}/compile_commands.json DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/.vscode)
 
-set(CMAKE_CXX_STANDARD 17)# use std::optional
+set(CMAKE_CXX_STANDARD 17) # use std::optional
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)# disable compiler extensions like gnu++17, so clang can be used
+set(CMAKE_CXX_EXTENSIONS OFF) # disable compiler extensions like gnu++17, so clang can be used
 
 set(3RDPARTY_INSTALL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/install")
 printvar(3RDPARTY_INSTALL_DIR)
@@ -71,9 +53,10 @@ endif()
 
 printvar(CMAKE_BUILD_TYPE)
 printvar(CMAKE_CXX_COMPILER)
-printvar(CMAKE_CXX_FLAGS)
-printvar(CMAKE_CXX_FLAGS_RELEASE)
-printvar(CMAKE_CXX_FLAGS_DEBUG)
+
+# printvar(CMAKE_CXX_FLAGS)
+# printvar(CMAKE_CXX_FLAGS_RELEASE)
+# printvar(CMAKE_CXX_FLAGS_DEBUG)
 
 # use the local install of OpenCV 4.2.0, to avoid conflict with the system OpenCV
 # Which on Jetpack 5.1 is OpenCV 4.5.1
@@ -95,6 +78,7 @@ add_subdirectory(3rdparty/g2o)
 add_subdirectory(3rdparty/Sophus)
 
 # Due to how Pangolin define targets, it is easier to use find_package() instead of add_subdirectory()
+# TODO: use local registry to avoid prepending CMAKE_MODULE_PATH
 list(PREPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/submodules/install/lib/cmake)
 find_package(Pangolin REQUIRED)
 
@@ -105,13 +89,13 @@ file(GLOB_RECURSE SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc)
 file(GLOB_RECURSE HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h)
 
 set(LIBRARY_TYPE STATIC)
-add_library(${PROJECT_NAME} ${LIBRARY_TYPE} "")
-target_sources(${PROJECT_NAME} PRIVATE
+add_library(orbslam3 ${LIBRARY_TYPE} "")
+target_sources(orbslam3 PRIVATE
     ${SRC_FILES}
     ${HEADER_FILES}
 )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC
+target_link_libraries(orbslam3 PUBLIC
     ${OpenCV_LIBS}
     ${EIGEN3_LIBS}
     ${Pangolin_LIBRARIES}
@@ -122,15 +106,15 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     -lcrypto
 )
 
-target_include_directories(${PROJECT_NAME}
+target_include_directories(orbslam3
     PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> # use absolute path to build
     $<INSTALL_INTERFACE:include> # use relative path to install
 )
 
-set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${HEADER_FILES}")
+set_target_properties(orbslam3 PROPERTIES PUBLIC_HEADER "${HEADER_FILES}")
 
-target_compile_options(${PROJECT_NAME} PRIVATE
+target_compile_options(orbslam3 PRIVATE
     -Wall
     -Wextra
     -Wno-deprecated-declarations # suppress warnings from Eigen3
@@ -145,19 +129,20 @@ target_compile_options(${PROJECT_NAME} PRIVATE
     $<$<CONFIG:Release>:-O3> # highest optimization level
     $<$<CONFIG:Release>:-march=native> # enable all CPU features available on the build machine
     $<$<CONFIG:Release>:-flto> # link time optimization
+
     # $<$<CONFIG:Release>:-ffast-math>
     $<$<CONFIG:Debug>:-g>
     $<$<CONFIG:Debug>:-O0>
     $<$<CONFIG:Debug>:-fno-omit-frame-pointer>
 )
 
-target_link_options(${PROJECT_NAME} PRIVATE
+target_link_options(orbslam3 PRIVATE
     $<$<CONFIG:Debug>:--coverage> # enable coverage for debug builds
 )
 
 # see: https://cmake.org/cmake/help/latest/prop_gbl/CMAKE_CXX_KNOWN_FEATURES.html#prop_gbl:CMAKE_CXX_KNOWN_FEATURES
 # for a list of features for each version of C++
-target_compile_features(${PROJECT_NAME} PRIVATE
+target_compile_features(orbslam3 PRIVATE
     cxx_std_17 # for std::optional
     cxx_constexpr
     cxx_auto_type
@@ -172,6 +157,12 @@ target_compile_features(${PROJECT_NAME} PRIVATE
     cxx_attribute_deprecated
 )
 
+target_compile_definitions(orbslam3
+    PRIVATE
+    $<$<CONFIG:Debug>:DEBUG>
+    ${PROJECT_VERSION}
+)
+
 # print_target_information(${PROJECT_NAME})
 
 # make the library importable from downstream projects with find_package()
@@ -181,53 +172,61 @@ include(GNUInstallDirs)
 # make export set
 # export(TARGETS ${PACKAGE_NAME} g2o DBoW2 sophus NAMESPACE orbslam3:: FILE ${PROJECT_NAME}Targets.cmake)
 
-
 # using GnuInstallDirs after cmake 3.14 makes it so you
 # do not have to specify the full path of RUNTIME DESTINATION etc.
 # set(TARGETS_FILE ${PROJECT_NAME}Targets.cmake)
+# print_all_variables_with_prefix(orbslam3)
+# print_all_variables_with_prefix(PROJECT)
 
-set(TARGETS ${PROJECT_NAME} g2o DBoW2 sophus)
+# Make project usable from build tree.
+export(TARGETS orbslam3 g2o DBoW2 sophus FILE orbslam3-targets.cmake)
+configure_file(${${PROJECT_NAME}_SOURCE_DIR}/cmake/${PROJECT_NAME}-config.cmake.in
+    ${PROJECT_NAME}-config.cmake @ONLY)
 
-install(TARGETS ${TARGETS} EXPORT ${PROJECT_NAME}Targets)
+configure_file(${${PROJECT_NAME}_SOURCE_DIR}/cmake/${PROJECT_NAME}-config-version.cmake.in
+    ${${PROJECT_NAME}_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake @ONLY)
 
-# Export the export set for downstream projects
-install(EXPORT ${PROJECT_NAME}Targets
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
-    NAMESPACE ${PROJECT_NAME}::
-)
+# set(TARGETS ${PROJECT_NAME} g2o DBoW2 sophus)
+# install(TARGETS ${TARGETS} EXPORT ${PROJECT_NAME}Targets)
 
-configure_package_config_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in # the template file
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake # destination
-    PATH_VARS CMAKE_INSTALL_INCLUDEDIR
-    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
-)
+# # Export the export set for downstream projects
+# install(EXPORT ${PROJECT_NAME}Targets
+# DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+# NAMESPACE ${PROJECT_NAME}::
+# )
 
-install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
-)
+# configure_package_config_file(
+# ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in # the template file
+# ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake # destination
+# PATH_VARS CMAKE_INSTALL_INCLUDEDIR
+# INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+# )
+
+# install(FILES
+# ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+# DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+# )
 
 # # create and install a version file. when find_package() is called, this ensures
 # # that the version found is compatible with the version required.
 # # ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}ConfigVersion.cmake
 # write_basic_package_version_file(
-#     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-#     VERSION ${PROJECT_VERSION}
-#     COMPATIBILITY SameMajorVersion
+# ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+# VERSION ${PROJECT_VERSION}
+# COMPATIBILITY SameMajorVersion
 # )
 
 # install(FILES
-#     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-#     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+# ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+# DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 # )
 
 # Install header files
-install(
-    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
-)
+# install(
+# DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}
+# DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+# )
 
-
+# make the library available in the users local cmake registry at ~/.cmake/packages/${PROJECT_NAME}
 set(CMAKE_EXPORT_PACKAGE_REGISTRY ON)
 export(PACKAGE ${PROJECT_NAME})
