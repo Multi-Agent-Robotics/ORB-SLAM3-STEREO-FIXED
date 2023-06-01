@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16.3) # 3.16.3 is the version on Ubuntu 20.04
+cmake_minimum_required(VERSION 3.16.3)# 3.16.3 is the version on Ubuntu 20.04
 
 set(MAJOR_VERSION 0)
 set(MINOR_VERSION 1)
@@ -58,9 +58,9 @@ endif()
 
 install(FILES ${CMAKE_BINARY_DIR}/compile_commands.json DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/.vscode)
 
-set(CMAKE_CXX_STANDARD 17) # use std::optional
+set(CMAKE_CXX_STANDARD 17)# use std::optional
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF) # disable compiler extensions like gnu++17, so clang can be used
+set(CMAKE_CXX_EXTENSIONS OFF)# disable compiler extensions like gnu++17, so clang can be used
 
 set(3RDPARTY_INSTALL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/install")
 printvar(3RDPARTY_INSTALL_DIR)
@@ -142,11 +142,9 @@ target_compile_options(${PROJECT_NAME} PRIVATE
     -Wno-deprecated
     -Wno-reorder
     -Wno-unused-but-set-variable
-
     $<$<CONFIG:Release>:-O3> # highest optimization level
     $<$<CONFIG:Release>:-march=native> # enable all CPU features available on the build machine
     $<$<CONFIG:Release>:-flto> # link time optimization
-
     # $<$<CONFIG:Release>:-ffast-math>
     $<$<CONFIG:Debug>:-g>
     $<$<CONFIG:Debug>:-O0>
