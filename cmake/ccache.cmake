@@ -6,6 +6,9 @@ function(use_ccache_if_available)
         string(ASCII 27 ESC)
         set(RESET "${ESC}[0m")
         SET(BLUE "${ESC}[0;34m")
+        set(BOLD "${ESC}[1m")
+
+        set(langs C CXX)
 
         set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
         set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
@@ -14,9 +17,9 @@ function(use_ccache_if_available)
         # check if cmake supports CMAKE_CUDA_COMPILER_LAUNCHER
         if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.9)
             set(CMAKE_CUDA_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
-            message(STATUS "${BLUE}Using ccache for CUDA compilation.${RESET}")
+            list(APPEND langs CUDA)
         endif()
 
-        message(STATUS "${BLUE}Using ccache for compilation.${RESET}")
+        message(STATUS "Using ${BOLD}ccache${RESET} for ${BLUE}${langs}${RESET} compilation.")
     endif()
 endfunction()
