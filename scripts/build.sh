@@ -21,10 +21,9 @@ if ! [ -d "$THIRD_PARTY_DIR" ]; then
 	exit 1
 fi
 
-printf "${CYAN}"
+printf "%s" "${CYAN}"
 test -f "$SCRIPT_DIR/orbslam3_ascii_logo.txt" && cat "$SCRIPT_DIR/orbslam3_ascii_logo.txt"
-printf "${NC}"
-# fail=0
+printf "%s" "${NC}"
 
 hr -
 
