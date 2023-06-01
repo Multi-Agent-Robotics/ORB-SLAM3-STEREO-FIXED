@@ -26,7 +26,7 @@ function(printlist var)
 endfunction()
 
 disallow_in_source_builds()
-disallow_system_install_prefix()
+# disallow_system_install_prefix()
 
 include(GNUInstallDirs) # for standard installation locations
 
@@ -229,7 +229,7 @@ find_package(Eigen3 3.1.0 REQUIRED)
 
 # using GnuInstallDirs after cmake 3.14 makes it so you
 # do not have to specify the full path of RUNTIME DESTINATION etc.
-install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets)
+# install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets)
 
 # target_include_directories(${PROJECT_NAME}
 # PUBLIC
@@ -255,59 +255,65 @@ target_compile_options(${PROJECT_NAME} PRIVATE
     -Wno-deprecated-declarations # suppress warnings from Eigen3
 )
 
-# install headers
-# install(FILES ${G2O_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
 
-# Export the export set for downstream projects
-install(EXPORT ${PROJECT_NAME}Targets
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}Targets
-    NAMESPACE ${PROJECT_NAME}::
-)
 
-# make the library importable from downstream projects with find_package()
-include(CMakePackageConfigHelpers)
+export(TARGETS ${PROJECT_NAME} FILE ${PROJECT_NAME}Targets.cmake)
+set(CMAKE_EXPORT_PACKAGE_REGISTRY ON)
+export(PACKAGE ${PROJECT_NAME})
 
-configure_package_config_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in # the template file
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake # destination
-    PATH_VARS CMAKE_INSTALL_INCLUDEDIR
-    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
-)
+# # install headers
+# # install(FILES ${G2O_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
 
-install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
-)
-
-# create and install a version file. when find_package() is called, this ensures
-# that the version found is compatible with the version required.
-write_basic_package_version_file(
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-    VERSION ${PROJECT_VERSION}
-    COMPATIBILITY SameMajorVersion
-)
-
-install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
-)
-
-# install(FILES config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
-
-# Install header files
-foreach(extension in h hpp)
-    install(DIRECTORY g2o
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-        FILES_MATCHING PATTERN "*.${extension}"
-    )
-endforeach()
-
-# install(DIRECTORY g2o
-# DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-# FILES_MATCHING PATTERN "*.h"
+# # Export the export set for downstream projects
+# install(EXPORT ${PROJECT_NAME}Targets
+#     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}Targets
+#     NAMESPACE ${PROJECT_NAME}::
 # )
 
-# install(
-# FILES ${G2O_HEADERS}
-# DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+# # make the library importable from downstream projects with find_package()
+# include(CMakePackageConfigHelpers)
+
+# configure_package_config_file(
+#     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in # the template file
+#     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake # destination
+#     PATH_VARS CMAKE_INSTALL_INCLUDEDIR
+#     INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 # )
+
+# install(FILES
+#     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+#     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+# )
+
+# # create and install a version file. when find_package() is called, this ensures
+# # that the version found is compatible with the version required.
+# write_basic_package_version_file(
+#     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+#     VERSION ${PROJECT_VERSION}
+#     COMPATIBILITY SameMajorVersion
+# )
+
+# install(FILES
+#     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+#     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+# )
+
+# # install(FILES config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
+
+# # Install header files
+# foreach(extension in h hpp)
+#     install(DIRECTORY g2o
+#         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+#         FILES_MATCHING PATTERN "*.${extension}"
+#     )
+# endforeach()
+
+# # install(DIRECTORY g2o
+# # DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+# # FILES_MATCHING PATTERN "*.h"
+# # )
+
+# # install(
+# # FILES ${G2O_HEADERS}
+# # DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+# # )

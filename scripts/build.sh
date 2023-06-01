@@ -3,7 +3,7 @@
 set -e
 set -o pipefail
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 
 # "${SCRIPT_DIR}"/install_pangolin.sh
 
@@ -17,13 +17,13 @@ echo -e "${YELLOW}PROJECT_DIR${NC}:     $PROJECT_DIR"
 echo -e "${YELLOW}THIRD_PARTY_DIR${NC}: $THIRD_PARTY_DIR"
 
 if ! [ -d "$THIRD_PARTY_DIR" ]; then
-	red "${THIRD_PARTY_DIR} directory not found\n"
-	exit 1
+    red "${THIRD_PARTY_DIR} directory not found\n"
+    exit 1
 fi
 
-printf "%s" "${CYAN}"
+echo -en "${CYAN}"
 test -f "$SCRIPT_DIR/orbslam3_ascii_logo.txt" && cat "$SCRIPT_DIR/orbslam3_ascii_logo.txt"
-printf "%s" "${NC}"
+echo -en "${NC}"
 
 hr -
 
@@ -36,10 +36,10 @@ hr -
 echo "Uncompressing vocabulary ..."
 pushd vocabulary || exit 1
 if [ ! -f ORBvoc.txt ]; then
-	tar -xf ORBvoc.txt.tar.gz
-	green "Uncompressing vocabulary done\n"
+    tar -xf ORBvoc.txt.tar.gz
+    green "Uncompressing vocabulary done\n"
 else
-	green "Vocabulary already uncompressed\n"
+    green "Vocabulary already uncompressed\n"
 fi
 popd
 

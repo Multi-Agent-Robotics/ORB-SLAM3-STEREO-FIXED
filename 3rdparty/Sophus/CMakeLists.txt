@@ -114,45 +114,49 @@ set(SOPHUS_CMAKE_EXPORT_DIR ${CMAKE_INSTALL_DATADIR}/sophus/cmake)
 
 set_target_properties(sophus PROPERTIES EXPORT_NAME Sophus)
 
-install(TARGETS sophus EXPORT SophusTargets)
-install(EXPORT SophusTargets
-  NAMESPACE Sophus::
-  DESTINATION ${SOPHUS_CMAKE_EXPORT_DIR}
-)
+
+
+# install(TARGETS sophus EXPORT SophusTargets)
+# install(EXPORT SophusTargets
+#   NAMESPACE Sophus::
+#   DESTINATION ${SOPHUS_CMAKE_EXPORT_DIR}
+# )
 
 export(TARGETS sophus NAMESPACE Sophus:: FILE SophusTargets.cmake)
+
+set(CMAKE_EXPORT_PACKAGE_REGISTRY ON)
 export(PACKAGE Sophus)
 
-configure_package_config_file(
-  SophusConfig.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/SophusConfig.cmake
-  INSTALL_DESTINATION ${SOPHUS_CMAKE_EXPORT_DIR}
-  NO_CHECK_REQUIRED_COMPONENTS_MACRO
-)
+# configure_package_config_file(
+#   SophusConfig.cmake.in
+#   ${CMAKE_CURRENT_BINARY_DIR}/SophusConfig.cmake
+#   INSTALL_DESTINATION ${SOPHUS_CMAKE_EXPORT_DIR}
+#   NO_CHECK_REQUIRED_COMPONENTS_MACRO
+# )
 
-# Remove architecture dependence. Sophus is a header-only library.
-set(TEMP_SIZEOF_VOID_P ${CMAKE_SIZEOF_VOID_P})
-unset(CMAKE_SIZEOF_VOID_P)
+# # Remove architecture dependence. Sophus is a header-only library.
+# set(TEMP_SIZEOF_VOID_P ${CMAKE_SIZEOF_VOID_P})
+# unset(CMAKE_SIZEOF_VOID_P)
 
-# Write version to file
-write_basic_package_version_file (
-  SophusConfigVersion.cmake
-  VERSION ${PROJECT_VERSION}
-  COMPATIBILITY SameMajorVersion
-)
+# # Write version to file
+# write_basic_package_version_file (
+#   SophusConfigVersion.cmake
+#   VERSION ${PROJECT_VERSION}
+#   COMPATIBILITY SameMajorVersion
+# )
 
-# Recover architecture dependence
-set(CMAKE_SIZEOF_VOID_P ${TEMP_SIZEOF_VOID_P})
+# # Recover architecture dependence
+# set(CMAKE_SIZEOF_VOID_P ${TEMP_SIZEOF_VOID_P})
 
-# Install cmake targets
-install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/SophusConfig.cmake
-        ${CMAKE_CURRENT_BINARY_DIR}/SophusConfigVersion.cmake
-  DESTINATION ${SOPHUS_CMAKE_EXPORT_DIR}
-)
+# # Install cmake targets
+# install(
+#   FILES ${CMAKE_CURRENT_BINARY_DIR}/SophusConfig.cmake
+#         ${CMAKE_CURRENT_BINARY_DIR}/SophusConfigVersion.cmake
+#   DESTINATION ${SOPHUS_CMAKE_EXPORT_DIR}
+# )
 
-# Install header files
-install(
-  FILES ${SOPHUS_HEADER_FILES}
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/sophus
-)
+# # Install header files
+# install(
+#   FILES ${SOPHUS_HEADER_FILES}
+#   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/sophus
+# )

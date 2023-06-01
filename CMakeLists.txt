@@ -33,7 +33,7 @@ elseif(WIN32)
 endif()
 
 disallow_in_source_builds()
-disallow_system_install_prefix()
+# disallow_system_install_prefix()
 suggest_ninja_if_available()
 
 find_program(CCACHE_PROGRAM ccache)
@@ -90,10 +90,6 @@ print_list_enumerated(CMAKE_MODULE_PATH)
 find_package(OpenCV 4.2.0 REQUIRED)
 find_package(Eigen3 3.1.0 REQUIRED)
 
-# found in ./3rdparty/install/lib/cmake
-# find_package(DBoW2 REQUIRED)
-# find_package(g2o REQUIRED)
-# find_package(Sophus REQUIRED)
 add_subdirectory(3rdparty/DBoW2)
 add_subdirectory(3rdparty/g2o)
 add_subdirectory(3rdparty/Sophus)
@@ -122,7 +118,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     DBoW2
     g2o
     sophus
-    ${Pangolin_LIBRARIES}
     Boost::serialization
     -lcrypto
 )
@@ -132,6 +127,8 @@ target_include_directories(${PROJECT_NAME}
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> # use absolute path to build
     $<INSTALL_INTERFACE:include> # use relative path to install
 )
+
+set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${HEADER_FILES}")
 
 target_compile_options(${PROJECT_NAME} PRIVATE
     -Wall
@@ -177,35 +174,32 @@ target_compile_features(${PROJECT_NAME} PRIVATE
     cxx_attribute_deprecated
 )
 
-find_program(CPPCHECK_EXECUTABLE NAMES cppcheck)
-
-if(CPPCHECK_EXECUTABLE)
-    add_custom_target(cppcheck
-        COMMAND ${CPPCHECK_EXECUTABLE} --enable=warning,performance,portability,style --std=c++17 -I${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/src
-        COMMENT "Running CppCheck"
-    )
-else()
-    message(WARNING "CppCheck not found! You won't be able to run cppcheck.")
-endif()
-
 # print_target_information(${PROJECT_NAME})
 
 # make the library importable from downstream projects with find_package()
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
 
+# make export set
+# export(TARGETS ${PACKAGE_NAME} g2o DBoW2 sophus NAMESPACE orbslam3:: FILE ${PROJECT_NAME}Targets.cmake)
+
+
 # using GnuInstallDirs after cmake 3.14 makes it so you
 # do not have to specify the full path of RUNTIME DESTINATION etc.
-install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets)
+# set(TARGETS_FILE ${PROJECT_NAME}Targets.cmake)
+
+set(TARGETS ${PROJECT_NAME} g2o DBoW2 sophus)
+
+install(TARGETS ${TARGETS} EXPORT ${PROJECT_NAME}Targets)
 
 # Export the export set for downstream projects
 install(EXPORT ${PROJECT_NAME}Targets
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}Targets
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
     NAMESPACE ${PROJECT_NAME}::
 )
 
 configure_package_config_file(
-    ${CMAKE_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in # the template file
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in # the template file
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake # destination
     PATH_VARS CMAKE_INSTALL_INCLUDEDIR
     INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
@@ -216,22 +210,26 @@ install(FILES
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
 
-# create and install a version file. when find_package() is called, this ensures
-# that the version found is compatible with the version required.
-# ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}ConfigVersion.cmake
-write_basic_package_version_file(
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-    VERSION ${PROJECT_VERSION}
-    COMPATIBILITY SameMajorVersion
-)
+# # create and install a version file. when find_package() is called, this ensures
+# # that the version found is compatible with the version required.
+# # ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}ConfigVersion.cmake
+# write_basic_package_version_file(
+#     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+#     VERSION ${PROJECT_VERSION}
+#     COMPATIBILITY SameMajorVersion
+# )
 
-install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
-)
+# install(FILES
+#     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+#     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+# )
 
 # Install header files
 install(
     DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
 )
+
+
+set(CMAKE_EXPORT_PACKAGE_REGISTRY ON)
+export(PACKAGE ${PROJECT_NAME})

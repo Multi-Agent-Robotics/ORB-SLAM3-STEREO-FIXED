@@ -15,7 +15,7 @@ function(disallow_system_install_prefix)
 endfunction()
 
 disallow_in_source_builds()
-disallow_system_install_prefix()
+# disallow_system_install_prefix()
 
 include(GNUInstallDirs) # for standard installation locations
 
@@ -80,51 +80,55 @@ target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)
 target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
 
 
-# install the library ----------------------------------------------------------
+export(TARGETS ${PROJECT_NAME} FILE ${PROJECT_NAME}Targets.cmake)
+set(CMAKE_EXPORT_PACKAGE_REGISTRY ON)
+export(PACKAGE ${PROJECT_NAME})
 
-# using GnuInstallDirs after cmake 3.14 makes it so you
-# do not have to specify the full path of RUNTIME DESTINATION etc.
-install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets)
+# # install the library ----------------------------------------------------------
 
-# Export the export set for downstream projects
-install(EXPORT ${PROJECT_NAME}Targets
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}Targets
-    NAMESPACE ${PROJECT_NAME}::
-)
+# # using GnuInstallDirs after cmake 3.14 makes it so you
+# # do not have to specify the full path of RUNTIME DESTINATION etc.
+# install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets)
 
-# make the library importable from downstream projects with find_package()
-include(CMakePackageConfigHelpers)
+# # Export the export set for downstream projects
+# install(EXPORT ${PROJECT_NAME}Targets
+#     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}Targets
+#     NAMESPACE ${PROJECT_NAME}::
+# )
 
-configure_package_config_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in # the template file
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake # destination
-    PATH_VARS CMAKE_INSTALL_INCLUDEDIR
-    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
-)
+# # make the library importable from downstream projects with find_package()
+# include(CMakePackageConfigHelpers)
 
-install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
-)
+# configure_package_config_file(
+#     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in # the template file
+#     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake # destination
+#     PATH_VARS CMAKE_INSTALL_INCLUDEDIR
+#     INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+# )
 
-# create and install a version file. when find_package() is called, this ensures
-# that the version found is compatible with the version required.
-# ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}ConfigVersion.cmake
-write_basic_package_version_file(
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-    VERSION ${PROJECT_VERSION}
-    COMPATIBILITY SameMajorVersion
-)
+# install(FILES
+#     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+#     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+# )
 
-install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
-)
+# # create and install a version file. when find_package() is called, this ensures
+# # that the version found is compatible with the version required.
+# # ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}ConfigVersion.cmake
+# write_basic_package_version_file(
+#     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+#     VERSION ${PROJECT_VERSION}
+#     COMPATIBILITY SameMajorVersion
+# )
 
-# Install header files
-install(
-    FILES ${HDRS}
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
-)
+# install(FILES
+#     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+#     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+# )
 
-# install(FILES ${HDRS_DUTILS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}/DUtils)
+# # Install header files
+# install(
+#     FILES ${HDRS}
+#     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+# )
+
+# # install(FILES ${HDRS_DUTILS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}/DUtils)
