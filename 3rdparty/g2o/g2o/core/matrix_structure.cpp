@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "matrix_structure.h"
+#include "g2o/core/matrix_structure.h"
 
 #include <string>
 #include <vector>
@@ -92,7 +92,7 @@ bool MatrixStructure::write(const char* filename) const
 
   string name = filename;
   std::string::size_type lastDot = name.find_last_of('.');
-  if (lastDot != std::string::npos) 
+  if (lastDot != std::string::npos)
     name = name.substr(0, lastDot);
 
   vector<pair<int, int> > entries;

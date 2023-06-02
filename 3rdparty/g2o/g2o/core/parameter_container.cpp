@@ -24,16 +24,16 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "parameter_container.h"
+#include "g2o/core/parameter_container.h"
 
 #include <iostream>
 
-#include "factory.h"
-#include "parameter.h"
+#include "g2o/core/factory.h"
+#include "g2o/core/parameter.h"
 
-#include "../stuff/macros.h"
-#include "../stuff/color_macros.h"
-#include "../stuff/string_tools.h"
+#include "g2o/stuff/macros.h"
+#include "g2o/stuff/color_macros.h"
+#include "g2o/stuff/string_tools.h"
 
 namespace g2o {
 
@@ -82,7 +82,7 @@ namespace g2o {
     erase(it);
     return p;
   }
-  
+
   bool ParameterContainer::write(std::ostream& os) const{
     Factory* factory = Factory::instance();
     for (const_iterator it=begin(); it!=end(); it++){
@@ -101,7 +101,7 @@ namespace g2o {
     Factory* factory = Factory::instance();
     HyperGraph::GraphElemBitset elemBitset;
     elemBitset[HyperGraph::HGET_PARAMETER] = 1;
-    
+
     while (1) {
       int bytesRead = readLine(is, currentLine);
       if (bytesRead == -1)
@@ -135,8 +135,8 @@ namespace g2o {
         }
       }
     } // while read line
-    
+
     return true;
   }
-  
+
 } // end namespace

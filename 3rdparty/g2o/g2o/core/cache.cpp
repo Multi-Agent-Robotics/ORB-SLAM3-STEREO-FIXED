@@ -24,9 +24,9 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "cache.h"
-#include "optimizable_graph.h"
-#include "factory.h"
+#include "g2o/core/cache.h"
+#include "g2o/core/optimizable_graph.h"
+#include "g2o/core/factory.h"
 
 #include <iostream>
 
@@ -56,10 +56,10 @@ namespace g2o {
   }
 
 
-  OptimizableGraph::Vertex* Cache::vertex() { 
-    if (container() ) 
-      return container()->vertex(); 
-    return 0; 
+  OptimizableGraph::Vertex* Cache::vertex() {
+    if (container() )
+      return container()->vertex();
+    return 0;
   }
 
   OptimizableGraph* Cache::graph() {
@@ -75,13 +75,13 @@ namespace g2o {
   ParameterVector& Cache::parameters() {
     return _parameters;
   }
-  
+
   Cache::CacheKey Cache::key() const {
     Factory* factory=Factory::instance();
     return CacheKey(factory->tag(this), _parameters);
   };
 
-  
+
   void Cache::update(){
     if (! _updateNeeded)
       return;
@@ -110,7 +110,7 @@ namespace g2o {
       _parentCaches.push_back(c);
     return c;
   }
-  
+
   bool Cache::resolveDependancies(){
     return true;
   }
@@ -125,7 +125,7 @@ namespace g2o {
       return 0;
     return it->second;
   }
-  
+
   Cache* CacheContainer::createCache(const Cache::CacheKey& key){
     Factory* f = Factory::instance();
     HyperGraph::HyperGraphElement* e = f->construct(key.type());
@@ -146,10 +146,10 @@ namespace g2o {
       insert(make_pair(key,c));
       c->update();
       return c;
-    } 
+    }
     return 0;
   }
-  
+
   OptimizableGraph::Vertex* CacheContainer::vertex() {
     return _vertex;
   }

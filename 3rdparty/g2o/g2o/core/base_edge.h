@@ -32,7 +32,7 @@
 
 #include <Eigen/Core>
 
-#include "optimizable_graph.h"
+#include "g2o/core/optimizable_graph.h"
 
 namespace g2o {
 
@@ -55,7 +55,7 @@ namespace g2o {
 
       virtual ~BaseEdge() {}
 
-      virtual double chi2() const 
+      virtual double chi2() const
       {
         return _error.dot(information()*_error);
       }

@@ -34,12 +34,12 @@
 #ifndef G2O_SIX_DOF_TYPES_EXPMAP
 #define G2O_SIX_DOF_TYPES_EXPMAP
 
-#include "../core/base_vertex.h"
-#include "../core/base_binary_edge.h"
-#include "../core/base_unary_edge.h"
-#include "se3_ops.h"
-#include "se3quat.h"
-#include "types_sba.h"
+#include "g2o/core/base_vertex.h"
+#include "g2o/core/base_binary_edge.h"
+#include "g2o/core/base_unary_edge.h"
+#include "g2o/types/se3_ops.h"
+#include "g2o/types/se3quat.h"
+#include "g2o/types/types_sba.h"
 #include <Eigen/Geometry>
 
 namespace g2o {
@@ -133,7 +133,7 @@ public:
     const VertexSBAPointXYZ* v2 = static_cast<const VertexSBAPointXYZ*>(_vertices[0]);
     return (v1->estimate().map(v2->estimate()))(2)>0.0;
   }
-    
+
 
   virtual void linearizeOplus();
 

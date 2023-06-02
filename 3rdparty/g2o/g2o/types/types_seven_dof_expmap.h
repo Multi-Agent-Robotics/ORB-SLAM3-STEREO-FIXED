@@ -25,16 +25,16 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Modified by Raúl Mur Artal (2014)
-// - Added EdgeInverseSim3ProjectXYZ 
+// - Added EdgeInverseSim3ProjectXYZ
 // - Modified VertexSim3Expmap to represent relative transformation between two cameras. Includes calibration of both cameras.
 
 #ifndef G2O_SEVEN_DOF_EXPMAP_TYPES
 #define G2O_SEVEN_DOF_EXPMAP_TYPES
 
-#include "../core/base_vertex.h"
-#include "../core/base_binary_edge.h"
-#include "types_six_dof_expmap.h"
-#include "sim3.h"
+#include "g2o/core/base_vertex.h"
+#include "g2o/core/base_binary_edge.h"
+#include "g2o/types/types_six_dof_expmap.h"
+#include "g2o/types/sim3.h"
 
 namespace g2o {
 
@@ -173,4 +173,3 @@ class EdgeInverseSim3ProjectXYZ : public  BaseBinaryEdge<2, Vector2d,  VertexSBA
 } // end namespace
 
 #endif
-

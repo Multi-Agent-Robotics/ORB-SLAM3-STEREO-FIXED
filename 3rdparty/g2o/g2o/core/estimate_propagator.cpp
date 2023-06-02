@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "estimate_propagator.h"
+#include "g2o/core/estimate_propagator.h"
 
 #include <queue>
 #include <vector>
@@ -83,10 +83,10 @@ namespace g2o {
     _visited.clear();
   }
 
-  void EstimatePropagator::propagate(OptimizableGraph::Vertex* v, 
-      const EstimatePropagator::PropagateCost& cost, 
+  void EstimatePropagator::propagate(OptimizableGraph::Vertex* v,
+      const EstimatePropagator::PropagateCost& cost,
        const EstimatePropagator::PropagateAction& action,
-       double maxDistance, 
+       double maxDistance,
        double maxEdgeCost)
   {
     OptimizableGraph::VertexSet vset;
@@ -94,10 +94,10 @@ namespace g2o {
     propagate(vset, cost, action, maxDistance, maxEdgeCost);
   }
 
-  void EstimatePropagator::propagate(OptimizableGraph::VertexSet& vset, 
-      const EstimatePropagator::PropagateCost& cost, 
+  void EstimatePropagator::propagate(OptimizableGraph::VertexSet& vset,
+      const EstimatePropagator::PropagateCost& cost,
        const EstimatePropagator::PropagateAction& action,
-       double maxDistance, 
+       double maxDistance,
        double maxEdgeCost)
   {
     reset();

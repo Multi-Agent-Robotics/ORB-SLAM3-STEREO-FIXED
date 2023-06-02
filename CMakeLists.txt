@@ -160,7 +160,6 @@ target_compile_features(orbslam3 PRIVATE
 target_compile_definitions(orbslam3
     PRIVATE
     $<$<CONFIG:Debug>:DEBUG>
-    ${PROJECT_VERSION}
 )
 
 # print_target_information(${PROJECT_NAME})

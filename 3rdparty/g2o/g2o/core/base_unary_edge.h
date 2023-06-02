@@ -31,10 +31,9 @@
 #include <cassert>
 #include <limits>
 
-#include "base_edge.h"
-#include "robust_kernel.h"
-// #include "../../config.h"
-#include "config.h"
+#include "g2o/core/base_edge.h"
+#include "g2o/core/robust_kernel.h"
+#include "g2o/config.h"
 
 namespace g2o {
 
@@ -94,7 +93,7 @@ namespace g2o {
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   };
 
-#include "core/base_unary_edge.hpp"
+#include "g2o/core/base_unary_edge.hpp"
 
 } // end namespace g2o
 

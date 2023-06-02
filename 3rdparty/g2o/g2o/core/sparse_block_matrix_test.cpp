@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "sparse_block_matrix.h"
+#include "g2o/core/sparse_block_matrix.h"
 #include <iostream>
 
 using namespace std;
@@ -82,7 +82,7 @@ int main (int argc, char** argv){
   M->add(Ms);
   M->add(Ms);
   cerr << *Ms;
-  
+
   SparseBlockMatrixX* Mt=0;
   M->transpose(Mt);
   cerr << *Mt << endl;
@@ -90,7 +90,7 @@ int main (int argc, char** argv){
   SparseBlockMatrixX* Mp=0;
   M->multiply(Mp, Mt);
   cerr << *Mp << endl;
-  
+
   int iperm[]={3,2,1,0};
   SparseBlockMatrixX* PMp=0;
 
@@ -101,7 +101,7 @@ int main (int argc, char** argv){
   Mp->block(3,0)->fill(0.);
   Mp->symmPermutation(PMp,iperm, true);
   cerr << *PMp << endl;
-  
-  
-  
+
+
+
 }

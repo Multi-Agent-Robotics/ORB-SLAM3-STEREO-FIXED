@@ -24,16 +24,16 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "optimization_algorithm_gauss_newton.h"
+#include "g2o/core/optimization_algorithm_gauss_newton.h"
 
 #include <iostream>
 
-#include "../stuff/timeutil.h"
-#include "../stuff/macros.h"
+#include "g2o/stuff/timeutil.h"
+#include "g2o/stuff/macros.h"
 
-#include "solver.h"
-#include "batch_stats.h"
-#include "sparse_optimizer.h"
+#include "g2o/core/solver.h"
+#include "g2o/core/batch_stats.h"
+#include "g2o/core/sparse_optimizer.h"
 using namespace std;
 
 namespace g2o {
@@ -52,7 +52,7 @@ namespace g2o {
     assert(_optimizer && "_optimizer not set");
     assert(_solver->optimizer() == _optimizer && "underlying linear solver operates on different graph");
     bool ok = true;
-    
+
     //here so that correct component for max-mixtures can be computed before the build structure
     double t=get_monotonic_time();
     _optimizer->computeActiveErrors();
@@ -60,7 +60,7 @@ namespace g2o {
     if (globalStats) {
       globalStats->timeResiduals = get_monotonic_time()-t;
     }
-    
+
     if (iteration == 0 && !online) { // built up the CCS structure, here due to easy time measure
       ok = _solver->buildStructure();
       if (! ok) {

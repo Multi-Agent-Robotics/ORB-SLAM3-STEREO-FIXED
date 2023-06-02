@@ -27,12 +27,11 @@
 #ifndef G2O_FACTORY_H
 #define G2O_FACTORY_H
 
-// #include "../../config.h"
-#include "config.h"
+#include "g2o/config.h"
 
-#include "../stuff/misc.h"
-#include "hyper_graph.h"
-#include "creators.h"
+#include "g2o/stuff/misc.h"
+#include "g2o/core/hyper_graph.h"
+#include "g2o/core/creators.h"
 
 #include <string>
 #include <map>
@@ -44,7 +43,7 @@
 namespace g2o {
 
   class AbstractHyperGraphElementCreator;
-  
+
   /**
    * \brief create vertices and edges based on TAGs in, for example, a file
    */
@@ -108,11 +107,11 @@ namespace g2o {
             creator = 0;
             elementTypeBit = -1;
           }
-        
+
           ~CreatorInformation()
           {
             std::cout << "Deleting " << (void*) creator << std::endl;
-            
+
             delete creator;
           }
       };

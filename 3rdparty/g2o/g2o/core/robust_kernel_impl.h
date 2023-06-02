@@ -27,7 +27,7 @@
 #ifndef G2O_ROBUST_KERNEL_IMPL_H
 #define G2O_ROBUST_KERNEL_IMPL_H
 
-#include "robust_kernel.h"
+#include "g2o/core/robust_kernel.h"
 
 namespace g2o {
 
@@ -92,7 +92,7 @@ namespace g2o {
    * rho(e) = delta2(1-(1-e/delta2)^3)
    *
    * else
-   *              
+   *
    * rho(e) = delta2
    */
   class  RobustKernelTukey : public RobustKernel
@@ -151,7 +151,7 @@ namespace g2o {
 
   /**
    * \brief Dynamic covariance scaling - DCS
-   *  
+   *
    * See paper Robust Map Optimization from Agarwal et al.  ICRA 2013
    *
    * delta is used as $phi$

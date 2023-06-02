@@ -84,6 +84,17 @@ if(OPENMP_FOUND AND G2O_USE_OPENMP)
     message(STATUS "Compiling with OpenMP support")
 endif(OPENMP_FOUND AND G2O_USE_OPENMP)
 
+# Find Eigen3
+# set(EIGEN3_INCLUDE_DIR ${G2O_EIGEN3_INCLUDE})
+find_package(Eigen3 3.1.0 REQUIRED)
+
+# if(EIGEN3_FOUND)
+# set(G2O_EIGEN3_INCLUDE ${EIGEN3_INCLUDE_DIR} CACHE PATH "Directory of Eigen3")
+# else()
+# set(G2O_EIGEN3_INCLUDE "" CACHE PATH "Directory of Eigen3")
+# endif()
+
+
 # Compiler specific options for gcc
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -march=native")
@@ -217,15 +228,6 @@ target_sources(${PROJECT_NAME} PRIVATE
     g2o/stuff/property.h
 )
 
-# Find Eigen3
-# set(EIGEN3_INCLUDE_DIR ${G2O_EIGEN3_INCLUDE})
-find_package(Eigen3 3.1.0 REQUIRED)
-
-# if(EIGEN3_FOUND)
-# set(G2O_EIGEN3_INCLUDE ${EIGEN3_INCLUDE_DIR} CACHE PATH "Directory of Eigen3")
-# else()
-# set(G2O_EIGEN3_INCLUDE "" CACHE PATH "Directory of Eigen3")
-# endif()
 
 # using GnuInstallDirs after cmake 3.14 makes it so you
 # do not have to specify the full path of RUNTIME DESTINATION etc.
@@ -246,6 +248,8 @@ find_package(Eigen3 3.1.0 REQUIRED)
 # $<INSTALL_INTERFACE:include/g2o/types>
 # ${EIGEN3_INCLUDE_DIR}
 # )
+
+
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
     ${EIGEN3_LIBS}

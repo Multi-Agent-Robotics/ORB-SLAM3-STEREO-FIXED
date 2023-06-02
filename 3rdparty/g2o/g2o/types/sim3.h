@@ -27,7 +27,7 @@
 #ifndef G2O_SIM_3
 #define G2O_SIM_3
 
-#include "se3_ops.h"
+#include "g2o/types/se3_ops.h"
 #include <Eigen/Geometry>
 
 namespace g2o
@@ -36,7 +36,7 @@ namespace g2o
 
   typedef  Matrix <double, 7, 1> Vector7d;
   typedef  Matrix <double, 7, 7> Matrix7d;
-  
+
 
   struct Sim3
   {
@@ -150,9 +150,9 @@ public:
       Vector7d res;
       double sigma = std::log(s);
 
-      
 
-   
+
+
       Vector3d omega;
       Vector3d upsilon;
 
@@ -226,7 +226,7 @@ public:
       res[6] = sigma;
 
       return res;
-      
+
     }
 
 
@@ -234,7 +234,7 @@ public:
     {
       return Sim3(r.conjugate(), r.conjugate()*((-1./s)*t), 1./s);
     }
-    
+
 
     double operator[](int i) const
     {

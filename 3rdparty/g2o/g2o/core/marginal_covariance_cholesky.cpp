@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "marginal_covariance_cholesky.h"
+#include "g2o/core/marginal_covariance_cholesky.h"
 
 #include <algorithm>
 #include <cassert>
@@ -154,14 +154,14 @@ void MarginalCovarianceCholesky::computeCovariance(double** covBlocks, const std
 void MarginalCovarianceCholesky::computeCovariance(SparseBlockMatrix<MatrixXd>& spinv, const std::vector<int>& rowBlockIndices, const std::vector< std::pair<int, int> >& blockIndices)
 {
   // allocate the sparse
-  spinv = SparseBlockMatrix<MatrixXd>(&rowBlockIndices[0], 
-              &rowBlockIndices[0], 
+  spinv = SparseBlockMatrix<MatrixXd>(&rowBlockIndices[0],
+              &rowBlockIndices[0],
               rowBlockIndices.size(),
               rowBlockIndices.size(), true);
   _map.clear();
   vector<MatrixElem> elemsToCompute;
   for (size_t i = 0; i < blockIndices.size(); ++i) {
-    int blockRow=blockIndices[i].first;    
+    int blockRow=blockIndices[i].first;
     int blockCol=blockIndices[i].second;
     assert(blockRow>=0);
     assert(blockRow < (int)rowBlockIndices.size());
@@ -170,7 +170,7 @@ void MarginalCovarianceCholesky::computeCovariance(SparseBlockMatrix<MatrixXd>& 
 
     int rowBase=spinv.rowBaseOfBlock(blockRow);
     int colBase=spinv.colBaseOfBlock(blockCol);
-    
+
     MatrixXd *block=spinv.block(blockRow, blockCol, true);
     assert(block);
     for (int iRow=0; iRow<block->rows(); ++iRow)
@@ -194,13 +194,13 @@ void MarginalCovarianceCholesky::computeCovariance(SparseBlockMatrix<MatrixXd>& 
     computeEntry(me.r, me.c);
   }
 
-  // set the marginal covariance 
+  // set the marginal covariance
   for (size_t i = 0; i < blockIndices.size(); ++i) {
-    int blockRow=blockIndices[i].first;    
+    int blockRow=blockIndices[i].first;
     int blockCol=blockIndices[i].second;
     int rowBase=spinv.rowBaseOfBlock(blockRow);
     int colBase=spinv.colBaseOfBlock(blockCol);
-    
+
     MatrixXd *block=spinv.block(blockRow, blockCol);
     assert(block);
     for (int iRow=0; iRow<block->rows(); ++iRow)

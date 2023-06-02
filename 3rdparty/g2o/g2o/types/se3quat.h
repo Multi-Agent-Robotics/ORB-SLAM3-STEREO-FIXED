@@ -27,7 +27,7 @@
 #ifndef G2O_SE3QUAT_H_
 #define G2O_SE3QUAT_H_
 
-#include "se3_ops.h"
+#include "g2o/types/se3_ops.h"
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
@@ -55,7 +55,7 @@ namespace g2o {
         _t.setZero();
       }
 
-      SE3Quat(const Matrix3d& R, const Vector3d& t):_r(Quaterniond(R)),_t(t){ 
+      SE3Quat(const Matrix3d& R, const Vector3d& t):_r(Quaterniond(R)),_t(t){
         normalizeRotation();
       }
 

@@ -27,11 +27,10 @@
 #ifndef G2O_OPTMIZATION_ALGORITHM_PROPERTY_H
 #define G2O_OPTMIZATION_ALGORITHM_PROPERTY_H
 
-// #include "../../config.h"
-#include "config.h"
+#include "g2o/config.h"
 
-#include "../stuff/misc.h"
-#include "optimization_algorithm_property.h"
+#include "g2o/stuff/misc.h"
+#include "g2o/core/optimization_algorithm_property.h"
 
 #include <list>
 #include <iostream>
@@ -65,7 +64,7 @@ namespace g2o {
     protected:
       OptimizationAlgorithmProperty _property;
   };
-  
+
   /**
    * \brief create solvers based on their short name
    *
@@ -93,7 +92,7 @@ namespace g2o {
        * unregister a specific creator for allocating a solver
        */
       void unregisterSolver(AbstractOptimizationAlgorithmCreator* c);
-      
+
       /**
        * construct a solver based on its name, e.g., var, fix3_2_cholmod
        */

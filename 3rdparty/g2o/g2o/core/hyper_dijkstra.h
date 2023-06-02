@@ -31,7 +31,7 @@
 #include <set>
 #include <limits>
 
-#include "hyper_graph.h"
+#include "g2o/core/hyper_graph.h"
 
 namespace g2o{
 
@@ -46,12 +46,12 @@ namespace g2o{
       virtual double perform(HyperGraph::Vertex* v, HyperGraph::Vertex* vParent, HyperGraph::Edge* e, double distance);
     };
 
-    
+
     struct  AdjacencyMapEntry{
       friend struct HyperDijkstra;
-      AdjacencyMapEntry(HyperGraph::Vertex* _child=0, 
-          HyperGraph::Vertex* _parent=0, 
-          HyperGraph::Edge* _edge=0, 
+      AdjacencyMapEntry(HyperGraph::Vertex* _child=0,
+          HyperGraph::Vertex* _parent=0,
+          HyperGraph::Edge* _edge=0,
           double _distance=std::numeric_limits<double>::max());
       HyperGraph::Vertex* child() const {return _child;}
       HyperGraph::Vertex* parent() const {return _parent;}
@@ -71,27 +71,27 @@ namespace g2o{
     HyperDijkstra(HyperGraph* g);
     HyperGraph::VertexSet& visited() {return _visited; }
     AdjacencyMap& adjacencyMap() {return _adjacencyMap; }
-    HyperGraph* graph() {return _graph;} 
+    HyperGraph* graph() {return _graph;}
 
-    void shortestPaths(HyperGraph::Vertex* v, 
-           HyperDijkstra::CostFunction* cost, 
-           double maxDistance=std::numeric_limits< double >::max(), 
-           double comparisonConditioner=1e-3, 
+    void shortestPaths(HyperGraph::Vertex* v,
+           HyperDijkstra::CostFunction* cost,
+           double maxDistance=std::numeric_limits< double >::max(),
+           double comparisonConditioner=1e-3,
            bool directed=false,
            double maxEdgeCost=std::numeric_limits< double >::max());
 
-    void shortestPaths(HyperGraph::VertexSet& vset, 
-           HyperDijkstra::CostFunction* cost, 
-           double maxDistance=std::numeric_limits< double >::max(), 
-           double comparisonConditioner=1e-3, 
+    void shortestPaths(HyperGraph::VertexSet& vset,
+           HyperDijkstra::CostFunction* cost,
+           double maxDistance=std::numeric_limits< double >::max(),
+           double comparisonConditioner=1e-3,
            bool directed=false,
            double maxEdgeCost=std::numeric_limits< double >::max());
 
 
     static void computeTree(AdjacencyMap& amap);
     static void visitAdjacencyMap(AdjacencyMap& amap, TreeAction* action, bool useDistance=false);
-    static void connectedSubset(HyperGraph::VertexSet& connected, HyperGraph::VertexSet& visited, 
-           HyperGraph::VertexSet& startingSet, 
+    static void connectedSubset(HyperGraph::VertexSet& connected, HyperGraph::VertexSet& visited,
+           HyperGraph::VertexSet& startingSet,
            HyperGraph* g, HyperGraph::Vertex* v,
            HyperDijkstra::CostFunction* cost, double distance, double comparisonConditioner,
            double maxEdgeCost=std::numeric_limits< double >::max() );

@@ -24,7 +24,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "batch_stats.h"
+#include "g2o/core/batch_stats.h"
 #include <cstring>
 
 namespace g2o {
@@ -52,16 +52,16 @@ namespace g2o {
     os << PTHING( numVertices ); // how many vertices are involved
     os << PTHING( numEdges ); // hoe many edges
     os << PTHING(  chi2 );  // total chi2
-    
+
     /** timings **/
     // nonlinear part
-    os << PTHING(  timeResiduals );  
+    os << PTHING(  timeResiduals );
     os << PTHING(  timeLinearize );   // jacobians
     os << PTHING(  timeQuadraticForm ); // construct the quadratic form in the graph
-    
+
     // block_solver (constructs Ax=b, plus maybe schur);
     os << PTHING(  timeSchurComplement ); // compute schur complement (0 if not done);
-    
+
     // linear solver (computes Ax=b); );
     os << PTHING(  timeSymbolicDecomposition ); // symbolic decomposition (0 if not done);
     os << PTHING(  timeNumericDecomposition ); // numeric decomposition  (0 if not done);
