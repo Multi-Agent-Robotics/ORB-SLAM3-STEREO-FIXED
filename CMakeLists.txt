@@ -186,6 +186,18 @@ configure_file(${${PROJECT_NAME}_SOURCE_DIR}/cmake/${PROJECT_NAME}-config.cmake.
 configure_file(${${PROJECT_NAME}_SOURCE_DIR}/cmake/${PROJECT_NAME}-config-version.cmake.in
     ${${PROJECT_NAME}_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake @ONLY)
 
+
+get_target_property(ORBSLAM3_INCLUDE_DIRS orbslam3 INTERFACE_INCLUDE_DIRECTORIES)
+print_list_enumerated(ORBSLAM3_INCLUDE_DIRS)
+get_test_property(DBoW2_INCLUDE_DIRS DBoW2 INCLUDE_DIRECTORIES)
+print_list_enumerated(DBoW2_INCLUDE_DIRS)
+get_test_property(g2o_INCLUDE_DIRS g2o INCLUDE_DIRECTORIES)
+print_list_enumerated(g2o_INCLUDE_DIRS)
+get_test_property(sophus_INCLUDE_DIRS sophus INCLUDE_DIRECTORIES)
+print_list_enumerated(sophus_INCLUDE_DIRS)
+
+
+
 # set(TARGETS ${PROJECT_NAME} g2o DBoW2 sophus)
 # install(TARGETS ${TARGETS} EXPORT ${PROJECT_NAME}Targets)
 
