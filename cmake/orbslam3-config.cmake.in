@@ -7,5 +7,6 @@ include("@PROJECT_BINARY_DIR@/orbslam3-targets.cmake")
 set(orbslam3_INCLUDE_DIRS "@orbslam3_SOURCE_DIR@/include")
 # I am tired of cmake's bullshit, so I am just going to hardcode this
 list(APPEND orbslam3_INCLUDE_DIRS "@PROJECT_SOURCE_DIR@/3rdparty/DBoW2/include")
+list(APPEND orbslam3_INCLUDE_DIRS "@PROJECT_SOURCE_DIR@/3rdparty/DBoW2/src") # for DUtils
 list(APPEND orbslam3_INCLUDE_DIRS "@PROJECT_SOURCE_DIR@/3rdparty/g2o")
 list(APPEND orbslam3_INCLUDE_DIRS "@PROJECT_SOURCE_DIR@/3rdparty/Sophus")
