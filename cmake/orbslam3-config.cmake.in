@@ -10,3 +10,10 @@ list(APPEND orbslam3_INCLUDE_DIRS "@PROJECT_SOURCE_DIR@/3rdparty/DBoW2/include")
 list(APPEND orbslam3_INCLUDE_DIRS "@PROJECT_SOURCE_DIR@/3rdparty/DBoW2/src") # for DUtils
 list(APPEND orbslam3_INCLUDE_DIRS "@PROJECT_SOURCE_DIR@/3rdparty/g2o")
 list(APPEND orbslam3_INCLUDE_DIRS "@PROJECT_SOURCE_DIR@/3rdparty/Sophus")
+
+include(CMakeFindDependencyMacro)
+find_dependency(Eigen3)
+find_dependency(OpenCV)
+find_dependency(Pangolin) # a submodule of ORB_SLAM3, but will be installed in the local package registry at ~/.cmake/packages/Pangolin
+# find_dependency does NOT support COMPONENTS
+find_package(Boost REQUIRED COMPONENTS serialization)

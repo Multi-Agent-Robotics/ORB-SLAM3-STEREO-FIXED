@@ -558,7 +558,7 @@ namespace orbslam3 {
             else{
                 output << "Kannala-Brandt";
             }
-            
+
             if(settings.cameraType_ != Settings::Rectified){
                 output << "" << ": [";
                 for(size_t i = 0; i < settings.originalCalib2_->size(); i++){
@@ -638,4 +638,4 @@ namespace orbslam3 {
 
         return output;
     }
-};
+}

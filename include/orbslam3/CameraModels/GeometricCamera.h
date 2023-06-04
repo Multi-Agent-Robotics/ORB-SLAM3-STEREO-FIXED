@@ -107,6 +107,3 @@ namespace orbslam3 {
         unsigned int mnType;
     };
 }
-
-
-// #endif //CAMERAMODELS_GEOMETRICCAMERA_H

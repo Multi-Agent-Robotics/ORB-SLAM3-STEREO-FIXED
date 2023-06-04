@@ -428,10 +428,11 @@ namespace orbslam3
                                        vector<MapPoint*> &vpMatched, int th, float ratioHamming)
     {
         // Get Calibration Parameters for later projection
-        const float &fx = pKF->fx;
-        const float &fy = pKF->fy;
-        const float &cx = pKF->cx;
-        const float &cy = pKF->cy;
+        // CHANGED(02-06-2023 14:32:52, kristoffer, compiler): the compiler flags these variables as unused
+        // const float &fx = pKF->fx;
+        // const float &fy = pKF->fy;
+        // const float &cx = pKF->cx;
+        // const float &cy = pKF->cy;
 
         Sophus::SE3f Tcw = Sophus::SE3f(Scw.rotationMatrix(),Scw.translation()/Scw.scale());
         Eigen::Vector3f Ow = Tcw.inverse().translation();

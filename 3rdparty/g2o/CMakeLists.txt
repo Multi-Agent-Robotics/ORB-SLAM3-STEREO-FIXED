@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16.3) # default version on Ubuntu 20.04
+cmake_minimum_required(VERSION 3.16.3 FATAL_ERROR) # default version on Ubuntu 20.04
 project(g2o VERSION 0.1.0 LANGUAGES CXX C)
 
 function(disallow_in_source_builds)
@@ -26,8 +26,8 @@ function(printlist var)
 endfunction()
 
 disallow_in_source_builds()
-# disallow_system_install_prefix()
 
+# disallow_system_install_prefix()
 include(GNUInstallDirs) # for standard installation locations
 
 set(CMAKE_CXX_STANDARD 14)
@@ -94,7 +94,6 @@ find_package(Eigen3 3.1.0 REQUIRED)
 # set(G2O_EIGEN3_INCLUDE "" CACHE PATH "Directory of Eigen3")
 # endif()
 
-
 # Compiler specific options for gcc
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -march=native")
@@ -112,24 +111,25 @@ set(G2O_CXX_COMPILER "${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER}")
 configure_file(g2o/config.h.in ${g2o_SOURCE_DIR}/g2o/config.h)
 
 # create the library
-add_library(${PROJECT_NAME} STATIC "")
+add_library(${PROJECT_NAME} SHARED "")
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)
 target_include_directories(${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/g2o>
+
     # $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/g2o>
     # $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/g2o/core>
     # $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/g2o/solvers>
     # $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/g2o/stuff>
     # $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/g2o/types>
-
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/g2o>
     ${EIGEN3_INCLUDE_DIR}
 )
 target_compile_options(${PROJECT_NAME} PRIVATE
--Wall
-    $<$<CONFIG:Release>:-O3 -march=native>
-    $<$<CONFIG:Debug>:-O0 -g>
+    -Wall
+
+    # $<$<CONFIG:Release>:-O3 -march=native>
+    # $<$<CONFIG:Debug>:-O0 -g>
 )
 
 file(GLOB_RECURSE G2O_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
@@ -228,7 +228,6 @@ target_sources(${PROJECT_NAME} PRIVATE
     g2o/stuff/property.h
 )
 
-
 # using GnuInstallDirs after cmake 3.14 makes it so you
 # do not have to specify the full path of RUNTIME DESTINATION etc.
 # install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets)
@@ -248,8 +247,6 @@ target_sources(${PROJECT_NAME} PRIVATE
 # $<INSTALL_INTERFACE:include/g2o/types>
 # ${EIGEN3_INCLUDE_DIR}
 # )
-
-
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
     ${EIGEN3_LIBS}
@@ -258,8 +255,6 @@ target_link_libraries(${PROJECT_NAME}
 target_compile_options(${PROJECT_NAME} PRIVATE
     -Wno-deprecated-declarations # suppress warnings from Eigen3
 )
-
-
 
 export(TARGETS ${PROJECT_NAME} FILE ${PROJECT_NAME}Targets.cmake)
 set(CMAKE_EXPORT_PACKAGE_REGISTRY ON)
@@ -270,46 +265,46 @@ export(PACKAGE ${PROJECT_NAME})
 
 # # Export the export set for downstream projects
 # install(EXPORT ${PROJECT_NAME}Targets
-#     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}Targets
-#     NAMESPACE ${PROJECT_NAME}::
+# DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}Targets
+# NAMESPACE ${PROJECT_NAME}::
 # )
 
 # # make the library importable from downstream projects with find_package()
 # include(CMakePackageConfigHelpers)
 
 # configure_package_config_file(
-#     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in # the template file
-#     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake # destination
-#     PATH_VARS CMAKE_INSTALL_INCLUDEDIR
-#     INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+# ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in # the template file
+# ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake # destination
+# PATH_VARS CMAKE_INSTALL_INCLUDEDIR
+# INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 # )
 
 # install(FILES
-#     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
-#     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+# ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+# DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 # )
 
 # # create and install a version file. when find_package() is called, this ensures
 # # that the version found is compatible with the version required.
 # write_basic_package_version_file(
-#     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-#     VERSION ${PROJECT_VERSION}
-#     COMPATIBILITY SameMajorVersion
+# ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+# VERSION ${PROJECT_VERSION}
+# COMPATIBILITY SameMajorVersion
 # )
 
 # install(FILES
-#     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-#     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+# ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+# DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 # )
 
 # # install(FILES config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
 
 # # Install header files
 # foreach(extension in h hpp)
-#     install(DIRECTORY g2o
-#         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-#         FILES_MATCHING PATTERN "*.${extension}"
-#     )
+# install(DIRECTORY g2o
+# DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+# FILES_MATCHING PATTERN "*.${extension}"
+# )
 # endforeach()
 
 # # install(DIRECTORY g2o

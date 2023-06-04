@@ -933,10 +933,12 @@ void KeyFrame::PostLoad(map<long unsigned int, KeyFrame*>& mpKFid, map<long unsi
     mvpMapPoints.resize(N);
     for(int i=0; i<N; ++i)
     {
-        if(mvBackupMapPointsId[i] != -1)
+        if(mvBackupMapPointsId[i] != -1) {
             mvpMapPoints[i] = mpMPid[mvBackupMapPointsId[i]];
-        else
+        }
+        else {
             mvpMapPoints[i] = static_cast<MapPoint*>(NULL);
+        }
     }
 
     // Conected KeyFrames with him weight
@@ -949,8 +951,9 @@ void KeyFrame::PostLoad(map<long unsigned int, KeyFrame*>& mpKFid, map<long unsi
     }
 
     // Restore parent KeyFrame
-    if(mBackupParentId>=0)
+    if(mBackupParentId>=0) {
         mpParent = mpKFid[mBackupParentId];
+    }
 
     // KeyFrame childrens
     mspChildrens.clear();
