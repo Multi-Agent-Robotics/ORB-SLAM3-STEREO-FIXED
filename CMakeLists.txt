@@ -114,6 +114,12 @@ target_compile_options (orbslam3 PRIVATE
     -Wno-reorder
     -Wno-unused-but-set-variable
 
+    # if the compiler is clang
+    $<$<STREQUAL:${CMAKE_CXX_COMPILER_ID},Clang>:-fcolor-diagnostics>
+
+    # if the compiler is gcc
+    $<$<STREQUAL:${CMAKE_CXX_COMPILER_ID},GNU>:-fdiagnostics-color=always>
+
     # $<$<CONFIG:Release>:-O3> # highest optimization level
     # $<$<CONFIG:Release>:-march=native> # enable all CPU features available on the build machine
     # $<$<CONFIG:Release>:-flto> # link time optimization
