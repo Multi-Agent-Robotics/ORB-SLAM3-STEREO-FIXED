@@ -1895,7 +1895,7 @@ void Tracking::Track()
                 }
                 else
                 {
-                    DEBUG_LOG(stderr, "Timestamp jump detected, before IMU initialization. Reseting...");
+                    DEBUG_LOG(stderr, "Timestamp jump detected, before IMU initialization. Resetting...");
                     // cout << "Timestamp jump detected, before IMU initialization. Reseting..." << endl;
                     mpSystem->ResetActiveMap();
                 }
