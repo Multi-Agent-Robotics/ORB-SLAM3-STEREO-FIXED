@@ -34,6 +34,7 @@
 #include <mutex>
 #include <algorithm>
 #include <chrono>
+#include <vector>
 
 
 using namespace std;
@@ -49,8 +50,11 @@ Tracking::Tracking(System *pSys, ORBVocabulary* pVoc, FrameDrawer *pFrameDrawer,
     mpFrameDrawer(pFrameDrawer), mpMapDrawer(pMapDrawer), mpAtlas(pAtlas), mnLastRelocFrameId(0), time_recently_lost(5.0),
     mnInitialFrameId(0), mbCreatedMap(false), mnFirstFrameId(0), mpCamera2(nullptr), mpLastKeyFrame(static_cast<KeyFrame*>(NULL))
 {
+
+    // TODO(19-06-2023 10:30:04, kristoffer, change): Provide a settings object so we use the new settings parser
     // Load camera parameters from settings file
     if(settings){
+        std::cerr << __FILE__ << ":" << __LINE__ << ": " << "Using new settings parser" << std::endl;
         newParameterLoader(settings);
     }
     else{
@@ -1302,12 +1306,17 @@ bool Tracking::ParseORBParamFile(cv::FileStorage &fSettings)
 bool Tracking::ParseIMUParamFile(cv::FileStorage &fSettings)
 {
     bool b_miss_params = false;
+    std::vector<std::string> missing_params = {};
 
-    cv::Mat cvTbc;
+    cv::Mat cvTbc = cv::Mat::eye(4,4,CV_32F);
     cv::FileNode node = fSettings["Tbc"];
     if(!node.empty())
     {
-        cvTbc = node.mat();
+            cv::Mat temp = node.mat();
+        temp.convertTo(cvTbc, CV_32F);
+        // cvTbc = node.mat();
+        // std::cout << "cvTbc type: " << cvTbc.type() << std::endl;
+        // std::cout << "cvTbc: " << cvTbc << std::endl;
         if(cvTbc.rows != 4 || cvTbc.cols != 4)
         {
             std::cerr << "*Tbc matrix have to be a 4x4 transformation matrix*" << std::endl;
@@ -1316,24 +1325,46 @@ bool Tracking::ParseIMUParamFile(cv::FileStorage &fSettings)
     }
     else
     {
+        missing_params.push_back("Tbc");
+
         std::cerr << "*Tbc matrix doesn't exist*" << std::endl;
         b_miss_params = true;
     }
     cout << endl;
     cout << "Left camera to Imu Transform (Tbc): " << endl << cvTbc << endl;
-    Eigen::Matrix<float,4,4,Eigen::RowMajor> eigTbc(cvTbc.ptr<float>(0));
-    Sophus::SE3f Tbc(eigTbc);
+    // Eigen::Matrix<float,4,4,Eigen::RowMajor> eigTbc(cvTbc.ptr<float>(0));
+
+    // Eigen::Matrix<float,4,4,Eigen::RowMajor> eigTbc;
+    // Eigen::Matrix4f eigTbc;
+    Eigen::Matrix4f eigTbc = Eigen::Map<Eigen::Matrix<float,4,4,Eigen::RowMajor>>(cvTbc.ptr<float>(), cvTbc.rows, cvTbc.cols);
+
+    // for (int i = 0; i < 4; ++i) {
+    //     std::cerr << "[ ";
+    //     for (int j = 0; j < 4; ++j) {
+    //         const float el = cvTbc.at<float>(i,j);
+    //         std::cerr << el << " ";
+    //         eigTbc(i,j) = el;
+    //     }
+    //     std::cerr << "]" << std::endl;
+    // }
+
+    std::cerr << __FILE__ << ":" << __LINE__ << " Tbc:\n" << eigTbc << std::endl;
+    // Sophus::SE3f Tbc(eigTbc);
+    Sophus::SE3f Tbc(eigTbc.topLeftCorner<3,3>(), eigTbc.topRightCorner<3,1>());
+
 
     node = fSettings["InsertKFsWhenLost"];
     mInsertKFsLost = true;
     if(!node.empty() && node.isInt())
     {
         mInsertKFsLost = (bool) node.operator int();
+    } else {
+        missing_params.push_back("InsertKFsWhenLost");
     }
 
-    if(!mInsertKFsLost)
-        cout << "Do not insert keyframes when lost visual tracking " << endl;
-
+    if(!mInsertKFsLost) {
+        std::cerr << "Do not insert keyframes when lost visual tracking " << std::endl;
+    }
 
 
     float Ng, Na, Ngw, Naw;
@@ -1346,6 +1377,7 @@ bool Tracking::ParseIMUParamFile(cv::FileStorage &fSettings)
     }
     else
     {
+        missing_params.push_back("IMU.Frequency");
         std::cerr << "*IMU.Frequency parameter doesn't exist or is not an integer*" << std::endl;
         b_miss_params = true;
     }
@@ -1357,6 +1389,7 @@ bool Tracking::ParseIMUParamFile(cv::FileStorage &fSettings)
     }
     else
     {
+        missing_params.push_back("IMU.NoiseGyro");
         std::cerr << "*IMU.NoiseGyro parameter doesn't exist or is not a real number*" << std::endl;
         b_miss_params = true;
     }
@@ -1368,6 +1401,7 @@ bool Tracking::ParseIMUParamFile(cv::FileStorage &fSettings)
     }
     else
     {
+        missing_params.push_back("IMU.NoiseAcc");
         std::cerr << "*IMU.NoiseAcc parameter doesn't exist or is not a real number*" << std::endl;
         b_miss_params = true;
     }
@@ -1379,6 +1413,7 @@ bool Tracking::ParseIMUParamFile(cv::FileStorage &fSettings)
     }
     else
     {
+        missing_params.push_back("IMU.GyroWalk");
         std::cerr << "*IMU.GyroWalk parameter doesn't exist or is not a real number*" << std::endl;
         b_miss_params = true;
     }
@@ -1390,6 +1425,8 @@ bool Tracking::ParseIMUParamFile(cv::FileStorage &fSettings)
     }
     else
     {
+        missing_params.push_back("IMU.AccWalk");
+
         std::cerr << "*IMU.AccWalk parameter doesn't exist or is not a real number*" << std::endl;
         b_miss_params = true;
     }
@@ -1407,6 +1444,14 @@ bool Tracking::ParseIMUParamFile(cv::FileStorage &fSettings)
     if(b_miss_params)
     {
         return false;
+    }
+
+    if (! missing_params.empty()) {
+        std::cerr << "Missing parameters: ";
+        for (auto &param : missing_params) {
+            std::cerr << param << " ";
+        }
+        std::cerr << std::endl;
     }
 
     const float sf = sqrt(mImuFreq);
@@ -2345,15 +2390,20 @@ void Tracking::StereoInitialization()
                 return;
             }
 
-            if (!mFastInit && (mCurrentFrame.mpImuPreintegratedFrame->avgA-mLastFrame.mpImuPreintegratedFrame->avgA).norm()<0.5)
+            const double imu_avg_acceleration =  (mCurrentFrame.mpImuPreintegratedFrame->avgA - mLastFrame.mpImuPreintegratedFrame->avgA).norm();
+            const double min_acceleration_required = 0.5;
+            const bool enough_acceleration = imu_avg_acceleration >= min_acceleration_required;
+            // if (!mFastInit && (mCurrentFrame.mpImuPreintegratedFrame->avgA-mLastFrame.mpImuPreintegratedFrame->avgA).norm()<0.5)
+            if (!mFastInit && !enough_acceleration)
             {
-                cout << "not enough acceleration" << endl;
+                std::cerr << "[error] not enough acceleration. " << imu_avg_acceleration << " < " << min_acceleration_required << std::endl;
+                // cout << "not enough acceleration" << endl;
                 return;
             }
 
-            if(mpImuPreintegratedFromLastKF)
+            if(mpImuPreintegratedFromLastKF) {
                 delete mpImuPreintegratedFromLastKF;
-
+            }
             mpImuPreintegratedFromLastKF = new IMU::Preintegrated(IMU::Bias(),*mpImuCalib);
             mCurrentFrame.mpImuPreintegrated = mpImuPreintegratedFromLastKF;
         }
@@ -2367,9 +2417,9 @@ void Tracking::StereoInitialization()
             Vwb0.setZero();
             mCurrentFrame.SetImuPoseVelocity(Rwb0, twb0, Vwb0);
         }
-        else
+        else {
             mCurrentFrame.SetPose(Sophus::SE3f());
-
+        }
         // Create KeyFrame
         KeyFrame* pKFini = new KeyFrame(mCurrentFrame,mpAtlas->GetCurrentMap(),mpKeyFrameDB);
 
@@ -3656,7 +3706,7 @@ bool Tracking::Relocalization()
             int nmatches = matcher.SearchByBoW(pKF, mCurrentFrame, vvpMapPointMatches[i]);
             // COMMENT(22-05-2023 09:41:03, jens, filtering): maybe filtering should be done here.
             // In case the filtering would bring the amount of matches below 15, we should discard the keyframe
-                
+
             // ADDED(22-05-2023 09:31:20, jens, filtering): outliers being filtered from vvpMapPointMatches before ransac
             // filtering known outliers from vvpMapPointMatches
             // every outlier in the circular buffer is a known outlier
@@ -3672,7 +3722,7 @@ bool Tracking::Relocalization()
                     // if it is, remove it from vvMapPointMatches
                     // if it is not, continue
                     if (std::find(frame_outliers.begin(), frame_outliers.end(), mappoint) != frame_outliers.end()) {
-                        
+
                         // TODO(24-05-2023 09:46:24, jens, test): print or count if anything is filtered
                         // COMMENT(24-05-2023 09:48:50, jens, match): maybe match similarly to SearchByBoW instead
 
@@ -3737,7 +3787,7 @@ bool Tracking::Relocalization()
         {
             if(vbDiscarded[i])
                 continue;
-            
+
             // FOUND(15-05-2023 14:00:52, jens, ransac): run ransac - this must be where the outlier memory will need to be implemented
 
             // Perform 5 Ransac Iterations
