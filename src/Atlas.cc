@@ -18,6 +18,7 @@
 
 #include "orbslam3/Atlas.h"
 #include "orbslam3/Viewer.h"
+#include "log-macro.hpp"
 
 #include "orbslam3/CameraModels/GeometricCamera.h"
 #include "orbslam3/CameraModels/Pinhole.h"
@@ -58,18 +59,21 @@ Atlas::~Atlas()
 void Atlas::CreateNewMap()
 {
     unique_lock<mutex> lock(mMutexAtlas);
-    cout << "Creation of new map with id: " << Map::nNextId << endl;
+    // cout << "Creation of new map with id: " << Map::nNextId << endl;
+    DEBUG_LOG(stderr, "Creation of new map with id: %ld", Map::nNextId);
     if(mpCurrentMap){
         if(!mspMaps.empty() && mnLastInitKFidMap < mpCurrentMap->GetMaxKFid())
             mnLastInitKFidMap = mpCurrentMap->GetMaxKFid()+1; //The init KF is the next of current maximum
 
         mpCurrentMap->SetStoredMap();
-        cout << "Stored map with ID: " << mpCurrentMap->GetId() << endl;
+        // cout << "Stored map with ID: " << mpCurrentMap->GetId() << endl;
+        DEBUG_LOG(stderr, "Stored map with ID: %ld", mpCurrentMap->GetId());
 
         //if(mHasViewer)
         //    mpViewer->AddMapToCreateThumbnail(mpCurrentMap);
     }
-    cout << "Creation of new map with last KF id: " << mnLastInitKFidMap << endl;
+    // cout << "Creation of new map with last KF id: " << mnLastInitKFidMap << endl;
+    DEBUG_LOG(stderr, "Creation of new map with last KF id: %ld", mnLastInitKFidMap);
 
     mpCurrentMap = new Map(mnLastInitKFidMap);
     mpCurrentMap->SetCurrentMap();
@@ -79,7 +83,8 @@ void Atlas::CreateNewMap()
 void Atlas::ChangeMap(Map* pMap)
 {
     unique_lock<mutex> lock(mMutexAtlas);
-    cout << "Change to map with id: " << pMap->GetId() << endl;
+    // cout << "Change to map with id: " << pMap->GetId() << endl;
+    DEBUG_LOG(stderr, "Change to map with id: %ld", pMap->GetId());
     if(mpCurrentMap){
         mpCurrentMap->SetStoredMap();
     }

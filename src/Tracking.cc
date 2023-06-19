@@ -18,6 +18,7 @@
 
 
 #include "orbslam3/Tracking.h"
+#include "log-macro.hpp"
 
 #include "orbslam3/ORBmatcher.h"
 #include "orbslam3/FrameDrawer.h"
@@ -54,7 +55,7 @@ Tracking::Tracking(System *pSys, ORBVocabulary* pVoc, FrameDrawer *pFrameDrawer,
     // TODO(19-06-2023 10:30:04, kristoffer, change): Provide a settings object so we use the new settings parser
     // Load camera parameters from settings file
     if(settings){
-        std::cerr << __FILE__ << ":" << __LINE__ << ": " << "Using new settings parser" << std::endl;
+        DEBUG_LOG(stderr, "Using new settings parser");
         newParameterLoader(settings);
     }
     else{
@@ -1312,7 +1313,7 @@ bool Tracking::ParseIMUParamFile(cv::FileStorage &fSettings)
     cv::FileNode node = fSettings["Tbc"];
     if(!node.empty())
     {
-            cv::Mat temp = node.mat();
+        cv::Mat temp = node.mat();
         temp.convertTo(cvTbc, CV_32F);
         // cvTbc = node.mat();
         // std::cout << "cvTbc type: " << cvTbc.type() << std::endl;
@@ -1348,7 +1349,8 @@ bool Tracking::ParseIMUParamFile(cv::FileStorage &fSettings)
     //     std::cerr << "]" << std::endl;
     // }
 
-    std::cerr << __FILE__ << ":" << __LINE__ << " Tbc:\n" << eigTbc << std::endl;
+    DEBUG_LOG(stderr, "Tbc");
+    // std::cerr << __FILE__ << ":" << __LINE__ << " Tbc:\n" << eigTbc << std::endl;
     // Sophus::SE3f Tbc(eigTbc);
     Sophus::SE3f Tbc(eigTbc.topLeftCorner<3,3>(), eigTbc.topRightCorner<3,1>());
 
@@ -1880,7 +1882,8 @@ void Tracking::Track()
 
                 if(mpAtlas->isImuInitialized())
                 {
-                    cout << "Timestamp jump detected. State set to LOST. Reseting IMU integration..." << endl;
+                    DEBUG_LOG(stderr, "Timestamp jump detected. State set to LOST. Reseting IMU integration...");
+                    // cout << "Timestamp jump detected. State set to LOST. Reseting IMU integration..." << endl;
                     if(!pCurrentMap->GetIniertialBA2())
                     {
                         mpSystem->ResetActiveMap();
@@ -1892,7 +1895,8 @@ void Tracking::Track()
                 }
                 else
                 {
-                    cout << "Timestamp jump detected, before IMU initialization. Reseting..." << endl;
+                    DEBUG_LOG(stderr, "Timestamp jump detected, before IMU initialization. Reseting...");
+                    // cout << "Timestamp jump detected, before IMU initialization. Reseting..." << endl;
                     mpSystem->ResetActiveMap();
                 }
                 return;
@@ -2386,7 +2390,8 @@ void Tracking::StereoInitialization()
         {
             if (!mCurrentFrame.mpImuPreintegrated || !mLastFrame.mpImuPreintegrated)
             {
-                cout << "not IMU meas" << endl;
+                DEBUG_LOG(stderr, "IMU preintegration not set!");
+                // cout << "not IMU meas" << endl;
                 return;
             }
 
@@ -2396,8 +2401,7 @@ void Tracking::StereoInitialization()
             // if (!mFastInit && (mCurrentFrame.mpImuPreintegratedFrame->avgA-mLastFrame.mpImuPreintegratedFrame->avgA).norm()<0.5)
             if (!mFastInit && !enough_acceleration)
             {
-                std::cerr << "[error] not enough acceleration. " << imu_avg_acceleration << " < " << min_acceleration_required << std::endl;
-                // cout << "not enough acceleration" << endl;
+                DEBUG_LOG(stderr, "not enough acceleration. %f < %f", imu_avg_acceleration, min_acceleration_required);
                 return;
             }
 
@@ -2469,8 +2473,8 @@ void Tracking::StereoInitialization()
             }
         }
 
-        Verbose::PrintMess("New Map created with " + to_string(mpAtlas->MapPointsInMap()) + " points", Verbose::VERBOSITY_QUIET);
-
+        // Verbose::PrintMess("New Map created with " + to_string(mpAtlas->MapPointsInMap()) + " points", Verbose::VERBOSITY_QUIET);
+        DEBUG_LOG(stderr, "New Map created with %ld points", mpAtlas->MapPointsInMap());
         //cout << "Active map: " << mpAtlas->GetCurrentMap()->GetId() << endl;
 
         mpLocalMapper->InsertKeyFrame(pKFini);
@@ -4029,7 +4033,8 @@ void Tracking::ResetActiveMap(bool bLocMap)
     list<bool> lbLost;
     // lbLost.reserve(mlbLost.size());
     unsigned int index = mnFirstFrameId;
-    cout << "mnFirstFrameId = " << mnFirstFrameId << endl;
+    // cout << "mnFirstFrameId = " << mnFirstFrameId << endl;
+    DEBUG_LOG(stderr, "mnFirstFrameId = %d", mnFirstFrameId);
     for(Map* pMap : mpAtlas->GetAllMaps())
     {
         if(pMap->GetAllKeyFrames().size() > 0)
@@ -4041,7 +4046,8 @@ void Tracking::ResetActiveMap(bool bLocMap)
 
     //cout << "First Frame id: " << index << endl;
     int num_lost = 0;
-    cout << "mnInitialFrameId = " << mnInitialFrameId << endl;
+    // cout << "mnInitialFrameId = " << mnInitialFrameId << endl;
+    DEBUG_LOG(stderr, "mnInitialFrameId = %d", mnInitialFrameId);
 
     for(list<bool>::iterator ilbL = mlbLost.begin(); ilbL != mlbLost.end(); ilbL++)
     {
@@ -4055,7 +4061,8 @@ void Tracking::ResetActiveMap(bool bLocMap)
 
         index++;
     }
-    cout << num_lost << " Frames set to lost" << endl;
+    DEBUG_LOG(stderr, "%d Frames set to lost", num_lost);
+    // cout << num_lost << " Frames set to lost" << endl;
 
     mlbLost = lbLost;
 
@@ -4070,10 +4077,12 @@ void Tracking::ResetActiveMap(bool bLocMap)
 
     mbVelocity = false;
 
-    if(mpViewer)
+    if(mpViewer) {
         mpViewer->Release();
+    }
 
-    Verbose::PrintMess("   End reseting! ", Verbose::VERBOSITY_NORMAL);
+    DEBUG_LOG(stderr, "End reseting!");
+    // Verbose::PrintMess("   End reseting! ", Verbose::VERBOSITY_NORMAL);
 }
 
 vector<MapPoint*> Tracking::GetLocalMapMPS()

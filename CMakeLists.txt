@@ -95,6 +95,8 @@ target_link_libraries (orbslam3
 )
 
 target_include_directories (orbslam3
+    PRIVATE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
     PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> # use absolute path to build
     $<INSTALL_INTERFACE:include> # use relative path to install

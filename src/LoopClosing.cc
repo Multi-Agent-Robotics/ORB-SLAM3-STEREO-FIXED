@@ -19,6 +19,7 @@
 
 #include "orbslam3/LoopClosing.h"
 
+#include "log-macro.hpp"
 #include "orbslam3/Sim3Solver.h"
 #include "orbslam3/Converter.h"
 #include "orbslam3/Optimizer.h"
@@ -124,7 +125,8 @@ void LoopClosing::Run()
                     if ((mpTracker->mSensor==System::IMU_MONOCULAR || mpTracker->mSensor==System::IMU_STEREO || mpTracker->mSensor==System::IMU_RGBD) &&
                         (!mpCurrentKF->GetMap()->isImuInitialized()))
                     {
-                        cout << "IMU is not initilized, merge is aborted" << endl;
+                        // cout << "IMU is not initilized, merge is aborted" << endl;
+                        DEBUG_LOG(stderr, "IMU is not initilized, merge is aborted");
                     }
                     else
                     {
@@ -140,7 +142,8 @@ void LoopClosing::Run()
 
                         if(mpCurrentKF->GetMap()->IsInertial() && mpMergeMatchedKF->GetMap()->IsInertial())
                         {
-                            cout << "Merge check transformation with IMU" << endl;
+                            // cout << "Merge check transformation with IMU" << endl;
+                            DEBUG_LOG(stderr, "Merge check transformation with IMU");
                             if(mSold_new.scale()<0.90||mSold_new.scale()>1.1){
                                 mpMergeLastCurrentKF->SetErase();
                                 mpMergeMatchedKF->SetErase();
@@ -149,7 +152,9 @@ void LoopClosing::Run()
                                 mvpMergeMPs.clear();
                                 mnMergeNumNotFound = 0;
                                 mbMergeDetected = false;
-                                Verbose::PrintMess("scale bad estimated. Abort merging", Verbose::VERBOSITY_NORMAL);
+
+                                // Verbose::PrintMess("scale bad estimated. Abort merging", Verbose::VERBOSITY_NORMAL);
+                                DEBUG_LOG(stderr, "scale bad estimated. Abort merging");
                                 continue;
                             }
                             // If inertial, force only yaw
@@ -255,7 +260,8 @@ void LoopClosing::Run()
                         }
                         else
                         {
-                            cout << "BAD LOOP!!!" << endl;
+                            // cout << "BAD LOOP!!!" << endl;
+                            DEBUG_LOG(stderr, "BAD LOOP!!!");
                             bGoodLoop = false;
                         }
 
@@ -978,7 +984,9 @@ void LoopClosing::CorrectLoop()
     // If a Global Bundle Adjustment is running, abort it
     if(isRunningGBA())
     {
-        cout << "Stoping Global Bundle Adjustment...";
+        // cout << "Stoping Global Bundle Adjustment...";
+        DEBUG_LOG(stderr, "Stoping Global Bundle Adjustment...");
+
         unique_lock<mutex> lock(mMutexGBA);
         mbStopGBA = true;
 
@@ -989,7 +997,8 @@ void LoopClosing::CorrectLoop()
             mpThreadGBA->detach();
             delete mpThreadGBA;
         }
-        cout << "  Done!!" << endl;
+        DEBUG_LOG(stderr, "Done!!");
+        // cout << "  Done!!" << endl;
     }
 
     // Wait until Local Mapping has effectively stopped

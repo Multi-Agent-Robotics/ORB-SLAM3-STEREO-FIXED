@@ -23,6 +23,7 @@
 #include "orbslam3/Optimizer.h"
 #include "orbslam3/Converter.h"
 #include "orbslam3/GeometricTools.h"
+#include "log-macro.hpp"
 
 #include <mutex>
 #include <chrono>
@@ -137,7 +138,8 @@ void LocalMapping::Run()
                         {
                             if((mTinit<10.f) && (dist<0.02))
                             {
-                                cout << "Not enough motion for initializing. Reseting..." << endl;
+                                // cout << "Not enough motion for initializing. Reseting..." << endl;
+                                DEBUG_LOG(stderr, "Not enough motion for initializing. Reseting...");
                                 unique_lock<mutex> lock(mMutexReset);
                                 mbResetRequestedActiveMap = true;
                                 mpMapToReset = mpCurrentKeyFrame->GetMap();
@@ -572,7 +574,7 @@ void LocalMapping::CreateNewMapPoints()
                 cosParallaxStereo2 = cos(2*atan2(pKF2->mb/2,pKF2->mvDepth[idx2]));
 
             if (bStereo1 || bStereo2) totalStereoPts++;
-            
+
             cosParallaxStereo = min(cosParallaxStereo1,cosParallaxStereo2);
 
             Eigen::Vector3f x3D;
@@ -694,7 +696,7 @@ void LocalMapping::CreateNewMapPoints()
             MapPoint* pMP = new MapPoint(x3D, mpCurrentKeyFrame, mpAtlas->GetCurrentMap());
             if (bPointStereo)
                 countStereo++;
-            
+
             pMP->AddObservation(mpCurrentKeyFrame,idx1);
             pMP->AddObservation(pKF2,idx2);
 
@@ -708,7 +710,7 @@ void LocalMapping::CreateNewMapPoints()
             mpAtlas->AddMapPoint(pMP);
             mlpRecentAddedMapPoints.push_back(pMP);
         }
-    }    
+    }
 }
 
 void LocalMapping::SearchInNeighbors()
@@ -836,7 +838,8 @@ bool LocalMapping::Stop()
     if(mbStopRequested && !mbNotStop)
     {
         mbStopped = true;
-        cout << "Local Mapping STOP" << endl;
+        // cout << "Local Mapping STOP" << endl;
+        DEBUG_LOG(stderr, "Local Mapping STOP");
         return true;
     }
 
@@ -867,7 +870,8 @@ void LocalMapping::Release()
         delete *lit;
     mlNewKeyFrames.clear();
 
-    cout << "Local Mapping RELEASE" << endl;
+    // cout << "Local Mapping RELEASE" << endl;
+    DEBUG_LOG(stderr, "Local Mapping RELEASE");
 }
 
 bool LocalMapping::AcceptKeyFrames()
@@ -1057,10 +1061,12 @@ void LocalMapping::RequestReset()
 {
     {
         unique_lock<mutex> lock(mMutexReset);
-        cout << "LM: Map reset recieved" << endl;
+        // cout << "LM: Map reset recieved" << endl;
+        DEBUG_LOG(stderr,"LM: Map reset received.");
         mbResetRequested = true;
     }
-    cout << "LM: Map reset, waiting..." << endl;
+    // cout << "LM: Map reset, waiting..." << endl;
+    DEBUG_LOG(stderr,"LM: Map reset, waiting ...");
 
     while(1)
     {
@@ -1071,18 +1077,23 @@ void LocalMapping::RequestReset()
         }
         usleep(3000);
     }
-    cout << "LM: Map reset, Done!!!" << endl;
+
+    // cout << "LM: Map reset, Done!!!" << endl;
+    DEBUG_LOG(stderr,"LM: Map reset, DONE");
 }
 
 void LocalMapping::RequestResetActiveMap(Map* pMap)
 {
     {
         unique_lock<mutex> lock(mMutexReset);
-        cout << "LM: Active map reset recieved" << endl;
+        DEBUG_LOG(stderr, "LM: Active map reset received.");
+        // cout << "LM: Active map reset recieved" << endl;
         mbResetRequestedActiveMap = true;
         mpMapToReset = pMap;
     }
-    cout << "LM: Active map reset, waiting..." << endl;
+
+    DEBUG_LOG(stderr, "LM: Active map reset, waiting...");
+    // cout << "LM: Active map reset, waiting..." << endl;
 
     while(1)
     {
@@ -1093,7 +1104,8 @@ void LocalMapping::RequestResetActiveMap(Map* pMap)
         }
         usleep(3000);
     }
-    cout << "LM: Active map reset, Done!!!" << endl;
+    DEBUG_LOG(stderr, "LM: Active map reset, Done!!!");
+    // cout << "LM: Active map reset, Done!!!" << endl;
 }
 
 void LocalMapping::ResetIfRequested()
@@ -1105,7 +1117,8 @@ void LocalMapping::ResetIfRequested()
         {
             executed_reset = true;
 
-            cout << "LM: Reseting Atlas in Local Mapping..." << endl;
+            // cout << "LM: Reseting Atlas in Local Mapping..." << endl;
+            DEBUG_LOG(stderr,"LM: Reseting Atlas in Local Mapping...");
             mlNewKeyFrames.clear();
             mlpRecentAddedMapPoints.clear();
             mbResetRequested = false;
@@ -1119,12 +1132,14 @@ void LocalMapping::ResetIfRequested()
 
             mIdxInit=0;
 
-            cout << "LM: End reseting Local Mapping..." << endl;
+            // cout << "LM: End reseting Local Mapping..." << endl;
+            DEBUG_LOG(stderr,"LM: End reseting Local Mapping...");
         }
 
         if(mbResetRequestedActiveMap) {
             executed_reset = true;
-            cout << "LM: Reseting current map in Local Mapping..." << endl;
+            // cout << "LM: Reseting current map in Local Mapping..." << endl;
+            DEBUG_LOG(stderr,"LM: Reseting current map in Local Mapping...");
             mlNewKeyFrames.clear();
             mlpRecentAddedMapPoints.clear();
 
@@ -1136,11 +1151,14 @@ void LocalMapping::ResetIfRequested()
 
             mbResetRequested = false;
             mbResetRequestedActiveMap = false;
-            cout << "LM: End reseting Local Mapping..." << endl;
+            // cout << "LM: End reseting Local Mapping..." << endl;
+            DEBUG_LOG(stderr,"LM: End reseting Local Mapping...");
         }
     }
-    if(executed_reset)
-        cout << "LM: Reset free the mutex" << endl;
+    if(executed_reset) {
+        // cout << "LM: Reset free the mutex" << endl;
+        DEBUG_LOG(stderr,"LM: Reset free the mutex");
+    }
 
 }
 
@@ -1159,7 +1177,7 @@ bool LocalMapping::CheckFinish()
 void LocalMapping::SetFinish()
 {
     unique_lock<mutex> lock(mMutexFinish);
-    mbFinished = true;    
+    mbFinished = true;
     unique_lock<mutex> lock2(mMutexStop);
     mbStopped = true;
 }
@@ -1270,7 +1288,8 @@ void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
 
     if (mScale<1e-1)
     {
-        cout << "scale too small" << endl;
+        // cout << "scale too small" << endl;
+        DEBUG_LOG(stderr, "[error] scale too small");
         bInitializing=false;
         return;
     }
@@ -1369,7 +1388,8 @@ void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
             pKF->SetVelocity(pKF->mVwbGBA);
             pKF->SetNewBias(pKF->mBiasGBA);
         } else {
-            cout << "KF " << pKF->mnId << " not set to inertial!! \n";
+            // cout << "KF " << pKF->mnId << " not set to inertial!! \n";
+            DEBUG_LOG(stderr, "[error] KF %ld not set to inertial!", pKF->mnId);
         }
 
         lpKFtoCheck.pop_front();
@@ -1463,11 +1483,12 @@ void LocalMapping::ScaleRefinement()
 
     if (mScale<1e-1) // 1e-1
     {
-        cout << "scale too small" << endl;
+        // cout << "scale too small" << endl;
+        DEBUG_LOG(stderr, "[error] scale too small \n");
         bInitializing=false;
         return;
     }
-    
+
     Sophus::SO3d so3wg(mRwg);
     // Before this line we are not changing the map
     unique_lock<mutex> lock(mpAtlas->GetCurrentMap()->mMutexMapUpdate);
