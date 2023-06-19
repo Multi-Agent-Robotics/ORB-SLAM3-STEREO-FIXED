@@ -66,12 +66,19 @@ void LocalMapping::Run()
 {
     mbFinished = false;
 
+    // FOUND(19-06-2023 17:28:06, kristoffer, ): This method is called by a thread, so it will run in parallel with the rest of the system.
     while(1)
     {
         // Tracking will see that Local Mapping is busy
         SetAcceptKeyFrames(false);
 
         // Check if there are keyframes in the queue
+
+        const auto num_new_kfs = mlNewKeyFrames.size();
+        if (num_new_kfs > 0) {
+            DEBUG_LOG(stderr, "There are %ld new keyframes to process", num_new_kfs);
+        }
+
         if(CheckNewKeyFrames() && !mbBadImu)
         {
 #ifdef REGISTER_TIMES
@@ -81,6 +88,7 @@ void LocalMapping::Run()
             std::chrono::steady_clock::time_point time_StartProcessKF = std::chrono::steady_clock::now();
 #endif
             // BoW conversion and insertion in Map
+            DEBUG_LOG(stderr, "processing new keyframe");
             ProcessNewKeyFrame();
 #ifdef REGISTER_TIMES
             std::chrono::steady_clock::time_point time_EndProcessKF = std::chrono::steady_clock::now();
@@ -139,7 +147,7 @@ void LocalMapping::Run()
                             if((mTinit<10.f) && (dist<0.02))
                             {
                                 // cout << "Not enough motion for initializing. Reseting..." << endl;
-                                DEBUG_LOG(stderr, "Not enough motion for initializing. Reseting...");
+                                DEBUG_LOG(stderr, "Not enough motion for initializing. Resetting...");
                                 unique_lock<mutex> lock(mMutexReset);
                                 mbResetRequestedActiveMap = true;
                                 mpMapToReset = mpCurrentKeyFrame->GetMap();
@@ -1190,8 +1198,11 @@ bool LocalMapping::isFinished()
 
 void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
 {
-    if (mbResetRequested)
+    DEBUG_LOG(stderr, "Attempting to initialize IMU ...");
+    if (mbResetRequested) {
+        DEBUG_LOG(stderr, "Reset requested, aborting IMU initialization.");
         return;
+    }
 
     float minTime;
     int nMinKF;
@@ -1206,9 +1217,11 @@ void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
         nMinKF = 10;
     }
 
-
-    if(mpAtlas->KeyFramesInMap()<nMinKF)
+    const bool not_enough_kf_in_map = mpAtlas->KeyFramesInMap() < nMinKF;
+    if(not_enough_kf_in_map) {
+        DEBUG_LOG(stderr, "Not enough KF in map %ld < %d (where %d is minimum number of kf), aborting IMU initialization.", mpAtlas->KeyFramesInMap(), nMinKF, nMinKF);
         return;
+    }
 
     // Retrieve all keyframe in temporal order
     list<KeyFrame*> lpKF;
@@ -1221,12 +1234,18 @@ void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
     lpKF.push_front(pKF);
     vector<KeyFrame*> vpKF(lpKF.begin(),lpKF.end());
 
-    if(vpKF.size()<nMinKF)
+    if(vpKF.size()<nMinKF) {
+        DEBUG_LOG(stderr, "Not enough keyframes in map, aborting IMU initialization.");
         return;
+    }
 
-    mFirstTs=vpKF.front()->mTimeStamp;
-    if(mpCurrentKeyFrame->mTimeStamp-mFirstTs<minTime)
+    mFirstTs = vpKF.front()->mTimeStamp;
+    const bool not_enough_time = mpCurrentKeyFrame->mTimeStamp - mFirstTs < minTime;
+
+    if(not_enough_time) {
+        DEBUG_LOG(stderr, "Not enough time has passed, aborting IMU initialization.");
         return;
+    }
 
     bInitializing = true;
 

@@ -1845,35 +1845,43 @@ void Tracking::Track()
     if (bStepByStep)
     {
         std::cout << "Tracking: Waiting to the next step" << std::endl;
-        while(!mbStep && bStepByStep)
+        while(!mbStep && bStepByStep) {
             usleep(500);
+        }
         mbStep = false;
     }
 
     if(mpLocalMapper->mbBadImu)
     {
-        cout << "TRACK: Reset map because local mapper set the bad imu flag " << endl;
+        // cout << "TRACK: Reset map because local mapper set the bad imu flag " << endl;
+        DEBUG_LOG(stderr, "TRACK: Reset map because local mapper set the bad imu flag");
         mpSystem->ResetActiveMap();
         return;
     }
 
     Map* pCurrentMap = mpAtlas->GetCurrentMap();
-    if(!pCurrentMap)
+    if(pCurrentMap == nullptr)
     {
-        cout << "ERROR: There is not an active map in the atlas" << endl;
+        // cout << "ERROR: There is not an active map in the atlas" << endl;
+        DEBUG_LOG(stderr, "[error] There is not an active map in the atlas");
     }
 
-    if(mState!=NO_IMAGES_YET)
+    const double tolerated_time_difference = 1.0; // seconds
+    if(mState != NO_IMAGES_YET)
     {
-        if(mLastFrame.mTimeStamp>mCurrentFrame.mTimeStamp)
+        const bool last_frame_is_newer_than_current_frame = mLastFrame.mTimeStamp > mCurrentFrame.mTimeStamp;
+        if(last_frame_is_newer_than_current_frame)
         {
-            cerr << "ERROR: Frame with a timestamp older than previous frame detected!" << endl;
+            const double dt = mLastFrame.mTimeStamp - mCurrentFrame.mTimeStamp;
+            DEBUG_LOG(stderr, "[error] last frame %f is newer than current frame %f by %f", mLastFrame.mTimeStamp, mCurrentFrame.mTimeStamp, dt);
+            // cerr << "ERROR: Frame with a timestamp older than previous frame detected!" << endl;
             unique_lock<mutex> lock(mMutexImuQueue);
             mlQueueImuData.clear();
             CreateMapInAtlas();
             return;
         }
-        else if(mCurrentFrame.mTimeStamp>mLastFrame.mTimeStamp+1.0)
+
+        else if(mCurrentFrame.mTimeStamp > mLastFrame.mTimeStamp + tolerated_time_difference)
         {
             // cout << mCurrentFrame.mTimeStamp << ", " << mLastFrame.mTimeStamp << endl;
             // cout << "id last: " << mLastFrame.mnId << "    id curr: " << mCurrentFrame.mnId << endl;
@@ -2177,16 +2185,19 @@ void Tracking::Track()
                 bOK = TrackLocalMap();
 
             }
-            if(!bOK)
-                cout << "Fail to track local map!" << endl;
+            if(!bOK) {
+                // cout << "Fail to track local map!" << endl;
+                DEBUG_LOG(stderr, "Fail to track local map!");
+            }
         }
         else
         {
             // mbVO true means that there are few matches to MapPoints in the map. We cannot retrieve
             // a local map and therefore we do not perform TrackLocalMap(). Once the system relocalizes
             // the camera we will use the local map again.
-            if(bOK && !mbVO)
+            if(bOK && !mbVO) {
                 bOK = TrackLocalMap();
+            }
         }
 
         if(bOK)
@@ -2198,7 +2209,8 @@ void Tracking::Track()
                 Verbose::PrintMess("Track lost for less than one second...", Verbose::VERBOSITY_NORMAL);
                 if(!pCurrentMap->isImuInitialized() || !pCurrentMap->GetIniertialBA2())
                 {
-                    cout << "IMU is not or recently initialized. Reseting active map..." << endl;
+                    // cout << "IMU is not or recently initialized. Reseting active map..." << endl;
+                    DEBUG_LOG(stderr, "IMU is not or recently initialized. Reseting active map...");
                     mpSystem->ResetActiveMap();
                 }
 
@@ -2328,7 +2340,8 @@ void Tracking::Track()
             if (mSensor == System::IMU_MONOCULAR || mSensor == System::IMU_STEREO || mSensor == System::IMU_RGBD)
                 if (!pCurrentMap->isImuInitialized())
                 {
-                    Verbose::PrintMess("Track lost before IMU initialisation, reseting...", Verbose::VERBOSITY_QUIET);
+                    DEBUG_LOG(stderr, "Track lost before IMU initialisation, resetting...\n");
+                    // Verbose::PrintMess("Track lost before IMU initialisation, reseting...", Verbose::VERBOSITY_QUIET);
                     mpSystem->ResetActiveMap();
                     return;
                 }
