@@ -1869,10 +1869,11 @@ void Tracking::Track()
     const double tolerated_time_difference = 1.0; // seconds
     if(mState != NO_IMAGES_YET)
     {
+        const double dt = mLastFrame.mTimeStamp - mCurrentFrame.mTimeStamp;
+        DEBUG_LOG(stderr, "mLastFrame.mTimeStamp: %f, mCurrentFrame.mTimeStamp: %f, dt: %f", mLastFrame.mTimeStamp, mCurrentFrame.mTimeStamp, dt);
         const bool last_frame_is_newer_than_current_frame = mLastFrame.mTimeStamp > mCurrentFrame.mTimeStamp;
         if(last_frame_is_newer_than_current_frame)
         {
-            const double dt = mLastFrame.mTimeStamp - mCurrentFrame.mTimeStamp;
             DEBUG_LOG(stderr, "[error] last frame %f is newer than current frame %f by %f", mLastFrame.mTimeStamp, mCurrentFrame.mTimeStamp, dt);
             // cerr << "ERROR: Frame with a timestamp older than previous frame detected!" << endl;
             unique_lock<mutex> lock(mMutexImuQueue);
