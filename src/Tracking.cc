@@ -3680,7 +3680,7 @@ void Tracking::UpdateLocalKeyFrames()
 
 bool Tracking::Relocalization()
 {
-    Verbose::PrintMess("Starting relocalization", Verbose::VERBOSITY_NORMAL);
+    DEBUG_LOG(stderr, "Starting relocalization");
     // Compute Bag of Words Vector
     mCurrentFrame.ComputeBoW();
 
@@ -3689,7 +3689,8 @@ bool Tracking::Relocalization()
     vector<KeyFrame*> vpCandidateKFs = mpKeyFrameDB->DetectRelocalizationCandidates(&mCurrentFrame, mpAtlas->GetCurrentMap());
 
     if(vpCandidateKFs.empty()) {
-        Verbose::PrintMess("There are not candidates", Verbose::VERBOSITY_NORMAL);
+        DEBUG_LOG(stderr, "[error] There are 0 candidates, which is not enough to relocalize");
+        // Verbose::PrintMess("There are not candidates", Verbose::VERBOSITY_NORMAL);
         return false;
     }
 
@@ -3939,7 +3940,8 @@ bool Tracking::Relocalization()
     else
     {
         mnLastRelocFrameId = mCurrentFrame.mnId;
-        cout << "Relocalized!!" << endl;
+        DEBUG_LOG(stderr, "Successfully relocalized");
+        // cout << "Relocalized!!" << endl;
         return true;
     }
 
