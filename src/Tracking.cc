@@ -1869,7 +1869,7 @@ void Tracking::Track()
     const double tolerated_time_difference = 1.0; // seconds
     if(mState != NO_IMAGES_YET)
     {
-        const double dt = mLastFrame.mTimeStamp - mCurrentFrame.mTimeStamp;
+        const double dt = mCurrentFrame.mTimeStamp - mLastFrame.mTimeStamp;
         DEBUG_LOG(stderr, "mLastFrame.mTimeStamp: %f, mCurrentFrame.mTimeStamp: %f, dt: %f", mLastFrame.mTimeStamp, mCurrentFrame.mTimeStamp, dt);
         const bool last_frame_is_newer_than_current_frame = mLastFrame.mTimeStamp > mCurrentFrame.mTimeStamp;
         if(last_frame_is_newer_than_current_frame)
@@ -1882,7 +1882,7 @@ void Tracking::Track()
             return;
         }
 
-        else if(mCurrentFrame.mTimeStamp > mLastFrame.mTimeStamp + tolerated_time_difference)
+        else if(mCurrentFrame.mTimeStamp > (mLastFrame.mTimeStamp + tolerated_time_difference))
         {
             // cout << mCurrentFrame.mTimeStamp << ", " << mLastFrame.mTimeStamp << endl;
             // cout << "id last: " << mLastFrame.mnId << "    id curr: " << mCurrentFrame.mnId << endl;
@@ -2415,8 +2415,8 @@ void Tracking::StereoInitialization()
         const double imu_avg_acceleration =  (mCurrentFrame.mpImuPreintegratedFrame->avgA - mLastFrame.mpImuPreintegratedFrame->avgA).norm();
         const double min_acceleration_required = 0.5;
         const bool enough_acceleration = imu_avg_acceleration >= min_acceleration_required;
-        // if (!mFastInit && (mCurrentFrame.mpImuPreintegratedFrame->avgA-mLastFrame.mpImuPreintegratedFrame->avgA).norm()<0.5)
-        if (!mFastInit && !enough_acceleration)
+        if (!mFastInit && (mCurrentFrame.mpImuPreintegratedFrame->avgA-mLastFrame.mpImuPreintegratedFrame->avgA).norm()<0.5)
+        // if (!mFastInit && !enough_acceleration)
         {
             DEBUG_LOG(stderr, "not enough acceleration. %f < %f", imu_avg_acceleration, min_acceleration_required);
             return;
