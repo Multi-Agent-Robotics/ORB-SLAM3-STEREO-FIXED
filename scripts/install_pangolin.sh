@@ -9,7 +9,7 @@ THIRD_PARTY_DIR="$PROJECT_DIR/3rdparty"
 
 source "$SCRIPT_DIR/utils.sh"
 
-check_dependencies cmake g++ ninja git || exit 1
+check_dependencies_are_installed cmake g++ ninja git || exit 1
 
 cd "$THIRD_PARTY_DIR" || exit 1
 
@@ -34,6 +34,6 @@ echo "CMAKE_INSTALL_PREFIX: $CMAKE_INSTALL_PREFIX"
 cmake -S . -B ./build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX"
 cmake --build ./build --config Release
 
-green "Installing Pangolin to $CMAKE_INSTALL_PREFIX\n" 
+green "Installing Pangolin to $CMAKE_INSTALL_PREFIX\n"
 cmake --build ./build --target install --config Release
 green "Installing Pangolin DONE\n"
